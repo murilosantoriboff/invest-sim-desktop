@@ -92,6 +92,10 @@ canvas_render.py
 
 ## Diagrama de histórias de usuário
 
+Link: https://www.figma.com/board/nN0JSuSVPB9LzBQh5qHSJh/Hist%C3%B3rias-de-Usu%C3%A1rio?node-id=0-1&t=l3nvlIuwgJwutzGD-1
+
+![alt text](historias_usuarios.png)
+
 ---
 
 *Última atualização: Semana 1 — 07/04/2026*
