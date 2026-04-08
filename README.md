@@ -1,48 +1,48 @@
 # Simulador de Investimentos
 
-Trabalho da disciplina de Projeto Temático I — Universidade de Caxias do Sul, 2026.
+Trabalho da disciplina de Projeto Temático I - UCS
 
-**Grupo:** Grégori Barizon Muterle, Murilo Santorini Boff, Pedro Henrique Scopel da Silva
+**Grupo:** Grégori Barizon Muterle, Murilo Santori Boff, Pedro Henrique Scopel da Silva
 
 ---
 
-## O que é isso
+## Sobre o projeto
 
-Um simulador de investimentos desktop feito em Python. A ideia é simples: você coloca quanto quer investir, escolhe o tipo (CDB, Tesouro Direto, LCI/LCA, Poupança) e o prazo em anos — o programa mostra um gráfico de rosca animado com a projeção de rendimento.
+Um simulador de investimentos desktop feito em Python. A ideia é simples: você coloca quanto quer investir, escolhe o tipo de investimento e o prazo em anos, e o programa mostra um gráfico de rosca com a projeção de rendimento.
 
-O diferencial é que as taxas não são fixas no código. Elas vêm da API do Banco Central do Brasil, são salvas no Supabase e atualizadas automaticamente todo dia. Assim o simulador sempre usa os dados reais do mercado (Selic, CDI, IPCA).
+O diferencial é que as taxas não são fixas no código. Elas estão sempre atualizadas, a partir da API do Banco Central do Brasil, onde são carregadas e tratadas em um banco no Supabase. Assim, o simulador sempre usa os dados reais do mercado (Selic, CDI, IPCA).
 
 ## Funcionalidades
 
 - Adicionar e remover investimentos da carteira
 - Simular vários investimentos ao mesmo tempo, lado a lado
-- Escolher prazo de 1 a 30 anos (o gráfico atualiza na hora)
-- Gráfico de rosca animado: parte interna = capital, parte externa = rendimento projetado
+- Escolher o prazo de investimento
+- Gráfico de rosca: parte interna = valor investido, parte externa = rendimento projetado
 - Taxas reais puxadas do Banco Central via Supabase
-- Carteira salva localmente em JSON — reabre onde parou
+- Carteira salva localmente em JSON
 
 ## Tecnologias
 
-- **Python 3.11+** com Tkinter para a interface
+- **Python** com Tkinter para a interface
 - **Pillow** para renderizar o gráfico com antialiasing
-- **Supabase** (PostgreSQL) para armazenar os indicadores do BCB
+- **Supabase** banco PostgreSQL para armazenar os indicadores do BCB
 - **requests** para consumo das APIs
 
 ## Como rodar
 
+Clone o repositório e instale as dependências:
+
 ```bash
-git clone https://github.com/murilosantoriboff/Projeto_Tematico_UCS.git
-cd Projeto_Tematico_UCS
+git clone https://github.com/murilosantoriboff/invest-sim-desktop.git
+cd invest-sim-desktop
 pip install -r requirements.txt
 python src/main.py
 ```
 
-Sem configuração adicional. O banco de dados já está conectado.
-
 ## Estrutura do projeto
 
 ```
-Projeto_Tematico_UCS/
+invest-sim-desktop/
 ├── src/
 │   ├── main.py                         # ponto de entrada
 │   ├── core/
@@ -73,17 +73,17 @@ Projeto_Tematico_UCS/
 
 ## Status
 
-| Semana | Foco | Situação |
-|--------|------|----------|
-| 1 | Setup e arquitetura | Concluído |
-| 2 | Persistência de dados | Em andamento |
-| 3 | Regra de negócio | Aguardando |
-| 4 | Integração inicial | Aguardando |
-| 5 | Interface | Aguardando |
-| 6 | Integração completa | Aguardando |
-| 7 | Testes funcionais | Aguardando |
-| 8 | Testes não funcionais | Aguardando |
-| 9 | Refinamento final | Aguardando |
+| Semana |         Foco          |   Situação   |
+|--------|-----------------------|--------------|
+|   01   | Setup e arquitetura   | Concluído    |
+|   02   | Persistência de dados | Em andamento |
+|   03   | Regra de negócio      | Aguardando   |
+|   04   | Integração inicial    | Aguardando   |
+|   05   | Interface             | Aguardando   |
+|   06   | Integração completa   | Aguardando   |
+|   07   | Testes funcionais     | Aguardando   |
+|   08   | Testes não funcionais | Aguardando   |
+|   09   | Refinamento final     | Aguardando   |
 
 ---
 
