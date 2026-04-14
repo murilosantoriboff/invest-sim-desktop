@@ -2,9 +2,9 @@
 
 ## Descrição
 
-O sistema é dividido em três camadas bem separadas: apresentação, regra de negócio e persistência. Essa separação foi uma decisão deliberada desde o início — facilita manutenção, testes e a divisão de tarefas entre os membros do grupo.
+O simulador é uma aplicação desktop feita em Python e que roda localmente... A interface, os cálculos e o arquivo de dados ficam na própria máquina do usuário. A ideia central é simples: o usuário informa um valor e um tipo de investimento, e o sistema desenha um gráfico mostrando quanto esse dinheiro vai render ao longo do tempo.
 
-A aplicação roda localmente como um programa desktop Python/Tkinter. Os dados de mercado (taxas Selic, CDI, IPCA) vêm do Supabase, que por sua vez é alimentado diariamente pela API pública do Banco Central do Brasil. A carteira do usuário fica salva num arquivo JSON local.
+A aplicação roda localmente como um programa desktop através de Python/Tkinter. Os dados de mercado (taxas Selic, CDI, IPCA) vêm do Supabase, que por sua vez é alimentado diariamente pela API pública do Banco Central do Brasil. A carteira do usuário fica salva num arquivo JSON local.
 
 ---
 
