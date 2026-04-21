@@ -131,14 +131,12 @@ App inicia
 
 ## Validação
 
-O script `testar_persistencia.py` na raiz do projeto testa todas as funções de forma isolada:
+O script `testar_persistencia.py` em `src/tests/` testa todas as funções de forma isolada:
 - Salvar, carregar, atualizar e remover itens da carteira
 - Resiliência a JSON corrompido (retorna lista vazia em vez de crashar)
 - Salvar e carregar cache de taxas
 - Verificação de existência e data do cache
 
-Para rodar: `python testar_persistencia.py`
-
 ---
 
-*Última atualização: Semana 2 — 14/04/2026*
+*Última atualização: Semana 3 — 21/04/2026*

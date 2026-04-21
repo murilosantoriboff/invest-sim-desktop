@@ -9,7 +9,7 @@ import sys
 import os
 
 # Ajusta o path para importar o modulo corretamente
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from infrastructure.storage.json_repository import (
     salvar_carteira,
