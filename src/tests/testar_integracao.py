@@ -63,12 +63,10 @@ def fluxo_com_supabase():
     if not taxas:
         return
 
-    # salva no cache
     salvar_cache_taxas(taxas)
     cache = carregar_cache_taxas()
     teste("Cache salvo e carregado com mesma quantidade", len(cache) == len(taxas))
 
-    # monta uma carteira de teste
     carteira = [
         {"cod_investimento": "SELIC", "valor": 10000.0},
         {"cod_investimento": "CDI",   "valor": 5000.0},
@@ -95,7 +93,6 @@ def fluxo_com_cache():
     """Fluxo offline: usa cache local simulado."""
     print("\n--- Fluxo com cache local (offline) ---\n")
 
-    # simula taxas como se viessem do Supabase
     taxas_simuladas = [
         {"cod_investimento": "SELIC",    "ano_referencia": 2025, "vlr_mediana": 14.75},
         {"cod_investimento": "SELIC",    "ano_referencia": 2026, "vlr_mediana": 12.50},
@@ -109,12 +106,10 @@ def fluxo_com_cache():
         {"cod_investimento": "POUPANCA", "ano_referencia": 2026, "vlr_mediana": 7.35},
     ]
 
-    # salva e recarrega do cache (simula o fluxo real)
     salvar_cache_taxas(taxas_simuladas)
     taxas = carregar_cache_taxas()
     teste("Cache gravado e lido corretamente", len(taxas) == len(taxas_simuladas))
 
-    # monta carteira, salva e recarrega
     carteira_original = [
         {"cod_investimento": "SELIC",    "valor": 10000.0},
         {"cod_investimento": "CDI",      "valor": 5000.0},
@@ -124,7 +119,6 @@ def fluxo_com_cache():
     carteira = carregar_carteira()
     teste("Carteira salva e carregada com 3 itens", len(carteira) == 3)
 
-    # calcula projeção
     dados = preparar_dados_grafico(carteira, taxas, anos=5, ano_inicio=2025)
     teste("Gerou dados pra 3 investimentos", len(dados) == 3)
 
@@ -141,8 +135,8 @@ def fluxo_com_cache():
           totais["total_futuro"] > totais["total_investido"])
     teste("Ganho > 0", totais["total_ganho"] > 0)
 
-    # simula o usuário removendo um investimento
-    carteira.pop(2)  # remove Poupança
+
+    carteira.pop(2)
     salvar_carteira(carteira)
     carteira = carregar_carteira()
     teste("Após remover, carteira tem 2 itens", len(carteira) == 2)
