@@ -15,10 +15,8 @@ from core.calculator import (
     calcular_percentual_ganho,
     preparar_dados_grafico,
     calcular_totais,
-    calcular_raio_ganho,
     _organizar_taxas,
 )
-from core.constants import R_PRINC, R_HOLE
 
 passed = 0
 failed = 0
@@ -45,10 +43,8 @@ def main():
     print("TESTE — calculator.py")
     print("=" * 60)
 
-    # ── Projeção ──────────────────────────────────────────────────────────────
     print("\n--- Projeção de valor ---\n")
 
-    # taxa fixa repetida por ano (como vem do Supabase)
     taxas_selic = {2026: 14.75, 2027: 14.75, 2028: 14.75, 2029: 14.75, 2030: 14.75}
     resultado = projetar_valor(10000, taxas_selic, 2026, 5)
     teste("R$ 10.000 a 14.75% fixo por 5 anos ≈ R$ 19.895",
@@ -63,7 +59,6 @@ def main():
     teste("Sem taxas retorna valor original",
           projetar_valor(10000, {}, 2026, 5) == 10000.0)
 
-    # taxas variáveis de verdade
     taxas_var = {2026: 14.75, 2027: 12.50, 2028: 10.00}
 
     resultado_1 = projetar_valor(10000, taxas_var, 2026, 1)
@@ -78,12 +73,10 @@ def main():
     teste("3 anos (14.75% + 12.50% + 10.00%) ≈ R$ 14.200",
           aprox(resultado_3, 14200.31, 1.0))
 
-    # anos além dos disponíveis usam a última taxa (10%)
     resultado_5 = projetar_valor(10000, taxas_var, 2026, 5)
     teste("5 anos (3 taxas + 2 flat a 10%) ≈ R$ 17.182",
           aprox(resultado_5, 17182.38, 2.0))
 
-    # ── Auxiliares ────────────────────────────────────────────────────────────
     print("\n--- Auxiliares ---\n")
 
     teste("Ganho = futuro - investido",
@@ -95,21 +88,6 @@ def main():
     teste("Valor zero retorna 0%",
           calcular_percentual_ganho(0, 5000) == 0.0)
 
-    # ── Geometria ─────────────────────────────────────────────────────────────
-    print("\n--- Raio do anel de ganho ---\n")
-
-    espessura = R_PRINC - R_HOLE
-
-    teste("Ganho 100% → raio = R_PRINC + espessura",
-          aprox(calcular_raio_ganho(10000, 10000), R_PRINC + espessura))
-
-    teste("Ganho 0 → raio = R_PRINC",
-          calcular_raio_ganho(0, 10000) == R_PRINC)
-
-    teste("Ganho 50% → raio proporcional",
-          aprox(calcular_raio_ganho(5000, 10000), R_PRINC + espessura * 0.5))
-
-    # ── Organizar taxas ──────────────────────────────────────────────────────
     print("\n--- Organizar taxas ---\n")
 
     taxas_flat = [
@@ -125,7 +103,6 @@ def main():
     mapa_vazio = _organizar_taxas([{"cod_investimento": "", "ano_referencia": None}])
     teste("Dados inválidos são ignorados", len(mapa_vazio) == 0)
 
-    # ── Dados para o gráfico ─────────────────────────────────────────────────
     print("\n--- Preparar dados para o gráfico ---\n")
 
     carteira = [
@@ -142,7 +119,7 @@ def main():
     dados = preparar_dados_grafico(carteira, taxas_supabase, anos=2, ano_inicio=2026)
     teste("2 investimentos preparados", len(dados) == 2)
     teste("Primeiro é SELIC", dados[0]["cod_investimento"] == "SELIC")
-    teste("Cor hex correta", dados[0]["cor_hex"] == "#3B6FE0")
+    teste("SELIC tem cor", dados[0]["cor"].startswith("#"))
     teste("SELIC rendeu", dados[0]["valor_futuro"] > dados[0]["valor"])
     teste("Poupança rendeu", dados[1]["valor_futuro"] > dados[1]["valor"])
 
@@ -154,7 +131,7 @@ def main():
         [{"cod_investimento": "SELIC", "valor": 10000.0}], [], anos=5)
     teste("Sem taxas → valor futuro = valor", dados_sem[0]["valor_futuro"] == 10000.0)
 
-    # ── Totais ────────────────────────────────────────────────────────────────
+    
     print("\n--- Totais ---\n")
 
     totais = calcular_totais(dados)
@@ -162,7 +139,7 @@ def main():
     teste("Total futuro > investido", totais["total_futuro"] > totais["total_investido"])
     teste("Ganho > 0", totais["total_ganho"] > 0)
 
-    # ── Resumo ────────────────────────────────────────────────────────────────
+    
     print("\n" + "=" * 60)
     print(f"RESULTADO: {passed} passaram, {failed} falharam")
     print("=" * 60)

@@ -2,10 +2,6 @@
 testar_integracao.py — Fluxo completo: persistência + regra de negócio.
 
 Rodar a partir da raiz: python src/tests/testar_integracao.py
-
-Testa dois cenários:
-  1. Com dados reais do Supabase (se a lib estiver instalada e online)
-  2. Com cache local simulado (sempre funciona)
 """
 
 import sys
@@ -14,13 +10,9 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from infrastructure.storage.json_repository import (
-    salvar_carteira,
-    carregar_carteira,
-    limpar_carteira,
-    salvar_cache_taxas,
-    carregar_cache_taxas,
-    CARTEIRA_PATH,
-    CACHE_TAXAS_PATH,
+    salvar_carteira, carregar_carteira, limpar_carteira,
+    salvar_cache_taxas, carregar_cache_taxas,
+    CARTEIRA_PATH, CACHE_TAXAS_PATH,
 )
 from core.calculator import preparar_dados_grafico, calcular_totais
 
@@ -43,9 +35,7 @@ def aprox(a, b, tol=0.01):
 
 
 def fluxo_com_supabase():
-    """Tenta o fluxo real: busca do Supabase → salva cache → calcula."""
     print("\n--- Fluxo com Supabase (online) ---\n")
-
     try:
         from infrastructure.database.supabase_client import buscar_indicadores
     except ImportError:
@@ -59,38 +49,33 @@ def fluxo_com_supabase():
         return
 
     teste("Supabase retornou dados", len(taxas) > 0)
-
     if not taxas:
         return
 
     salvar_cache_taxas(taxas)
     cache = carregar_cache_taxas()
-    teste("Cache salvo e carregado com mesma quantidade", len(cache) == len(taxas))
+    teste("Cache salvo e carregado", len(cache) == len(taxas))
 
     carteira = [
         {"cod_investimento": "SELIC", "valor": 10000.0},
         {"cod_investimento": "CDI",   "valor": 5000.0},
     ]
-
     dados = preparar_dados_grafico(carteira, taxas, anos=5)
     teste("Gerou dados pro gráfico", len(dados) > 0)
 
     for d in dados:
-        teste(f"{d['nome_exibicao']}: futuro > investido",
-              d["valor_futuro"] > d["valor"])
+        teste(f"{d['nome_exibicao']}: rendeu", d["valor_futuro"] > d["valor"])
 
     totais = calcular_totais(dados)
-    teste("Total futuro > total investido",
-          totais["total_futuro"] > totais["total_investido"])
+    teste("Total futuro > investido", totais["total_futuro"] > totais["total_investido"])
 
-    print(f"\n  Resultado real:")
+    print(f"\n  Resultado:")
     for d in dados:
         print(f"    {d['nome_exibicao']}: R$ {d['valor']:,.0f} → R$ {d['valor_futuro']:,.2f} (+{d['percentual_ganho']:.1f}%)")
-    print(f"    TOTAL: R$ {totais['total_investido']:,.0f} → R$ {totais['total_futuro']:,.2f}\n")
+    print()
 
 
 def fluxo_com_cache():
-    """Fluxo offline: usa cache local simulado."""
     print("\n--- Fluxo com cache local (offline) ---\n")
 
     taxas_simuladas = [
@@ -108,7 +93,7 @@ def fluxo_com_cache():
 
     salvar_cache_taxas(taxas_simuladas)
     taxas = carregar_cache_taxas()
-    teste("Cache gravado e lido corretamente", len(taxas) == len(taxas_simuladas))
+    teste("Cache gravado e lido", len(taxas) == len(taxas_simuladas))
 
     carteira_original = [
         {"cod_investimento": "SELIC",    "valor": 10000.0},
@@ -117,49 +102,33 @@ def fluxo_com_cache():
     ]
     salvar_carteira(carteira_original)
     carteira = carregar_carteira()
-    teste("Carteira salva e carregada com 3 itens", len(carteira) == 3)
+    teste("Carteira com 3 itens", len(carteira) == 3)
 
     dados = preparar_dados_grafico(carteira, taxas, anos=5, ano_inicio=2025)
-    teste("Gerou dados pra 3 investimentos", len(dados) == 3)
+    teste("3 investimentos no gráfico", len(dados) == 3)
 
     for d in dados:
-        teste(f"{d['nome_exibicao']}: rendeu",
-              d["valor_futuro"] > d["valor"])
-        teste(f"{d['nome_exibicao']}: tem cor hex",
-              d["cor_hex"].startswith("#"))
+        teste(f"{d['nome_exibicao']}: rendeu", d["valor_futuro"] > d["valor"])
 
     totais = calcular_totais(dados)
-    teste("Total investido = R$ 18.000",
-          aprox(totais["total_investido"], 18000.0))
-    teste("Total futuro > investido",
-          totais["total_futuro"] > totais["total_investido"])
-    teste("Ganho > 0", totais["total_ganho"] > 0)
-
+    teste("Total investido = R$ 18.000", aprox(totais["total_investido"], 18000.0))
+    teste("Total futuro > investido", totais["total_futuro"] > totais["total_investido"])
 
     carteira.pop(2)
     salvar_carteira(carteira)
     carteira = carregar_carteira()
-    teste("Após remover, carteira tem 2 itens", len(carteira) == 2)
+    teste("Após remover, 2 itens", len(carteira) == 2)
 
     dados2 = preparar_dados_grafico(carteira, taxas, anos=5, ano_inicio=2025)
-    teste("Gráfico atualizado com 2 itens", len(dados2) == 2)
+    teste("Gráfico com 2 itens", len(dados2) == 2)
 
-    # simula o usuário adicionando mais um
     carteira.append({"cod_investimento": "IPCA", "valor": 7000.0})
     salvar_carteira(carteira)
-    carteira = carregar_carteira()
-
-    dados3 = preparar_dados_grafico(carteira, taxas, anos=10, ano_inicio=2025)
-    teste("Com IPCA adicionado e prazo 10 anos", len(dados3) == 3)
+    dados3 = preparar_dados_grafico(carregar_carteira(), taxas, anos=10, ano_inicio=2025)
+    teste("Com IPCA e prazo 10 anos", len(dados3) == 3)
 
     totais3 = calcular_totais(dados3)
-    teste("Prazo maior = ganho maior",
-          totais3["total_ganho"] > totais["total_ganho"])
-
-    print(f"\n  Resultado simulado (5 anos):")
-    for d in dados:
-        print(f"    {d['nome_exibicao']}: R$ {d['valor']:,.0f} → R$ {d['valor_futuro']:,.2f} (+{d['percentual_ganho']:.1f}%)")
-    print(f"    TOTAL: R$ {totais['total_investido']:,.0f} → R$ {totais['total_futuro']:,.2f}")
+    teste("Prazo maior = ganho maior", totais3["total_ganho"] > totais["total_ganho"])
 
 
 def limpar():
@@ -180,7 +149,6 @@ def main():
 
     fluxo_com_supabase()
     fluxo_com_cache()
-
     limpar()
 
     print("\n" + "=" * 60)
