@@ -15,8 +15,6 @@ A aplicação roda localmente como um programa desktop através de Python/Tkinte
 Responsável por tudo que o usuário vê e com o que interage.
 
 - `frames.py` — monta as telas do Tkinter, gerencia os eventos (cliques, digitação, mudança de prazo)
-- `canvas_render.py` — desenha o gráfico de rosca usando Pillow com antialiasing; também controla a animação de entrada
-- `styles.py` — define o tema visual: cores, fontes Poppins, estilos dos botões ttk
 
 Essa camada não faz cálculo nenhum e não acessa banco de dados. Ela só chama a camada de negócio e exibe o resultado.
 

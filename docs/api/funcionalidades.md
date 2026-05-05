@@ -7,7 +7,7 @@ A regra de negócio fica em `src/core/` com dois módulos:
 - `calculator.py` — cálculos financeiros e preparação de dados pro gráfico
 - `constants.py` — cores, dimensões, mapeamento de investimentos
 
-Nenhum dos dois depende de Tkinter ou Supabase.
+Nenhum depende de Supabase.
 
 ---
 
