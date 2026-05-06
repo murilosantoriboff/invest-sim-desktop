@@ -48,6 +48,9 @@ CY       = CV_H // 2
 R_EXT    = 180
 R_INT    = 100
 
+R_HOLE   = 86
+R_PRINC  = 152
+
 # Prazo
 PRAZO_MIN = 1
 PRAZO_MAX = 30

@@ -3,7 +3,7 @@ calculator.py — Cálculos financeiros e preparação de dados para o gráfico.
 """
 
 try:
-    from src.core.constants import INVESTIMENTOS, R_HOLE, R_PRINC
+    from src.core.constants import INVESTIMENTOS
 except ModuleNotFoundError:
     from core.constants import INVESTIMENTOS, R_HOLE, R_PRINC
 

@@ -2,17 +2,22 @@
 main.py — Ponto de entrada do Simulador.
 """
 
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import tkinter as tk
 import traceback
 import sys
 
-from core.constants import BG, PANEL, INVESTIMENTOS, PRAZO_MIN, PRAZO_MAX, PRAZO_DEFAULT
-from core.calculator import preparar_dados_grafico
-from infrastructure.storage.json_repository import (
+from src.core.constants import BG, PANEL, INVESTIMENTOS, PRAZO_MIN, PRAZO_MAX, PRAZO_DEFAULT
+from src.core.calculator import preparar_dados_grafico
+from src.infrastructure.storage.json_repository import (
     salvar_carteira, carregar_carteira,
     salvar_cache_taxas, carregar_cache_taxas,
 )
-from ui.frames import (
+from src.ui.frames import (
     configurar_estilos, criar_header, criar_input_panel,
     criar_area_grafico, desenhar_grafico, atualizar_legenda,
     criar_chips_bar, atualizar_chips,
