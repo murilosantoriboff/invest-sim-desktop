@@ -45,9 +45,9 @@ def configurar_estilos():
     for cod, config in INVESTIMENTOS.items():
         s.configure(f"Pill_{cod}.TButton", font=("Arial", 9, "bold"),
                     relief="flat", borderwidth=0, padding=(10, 6),
-                    background=config["cor_rgb"], foreground="white")
+                    background=config["cor"], foreground="white")
         s.map(f"Pill_{cod}.TButton",
-              background=[("active", config["cor_rgb"])])
+              background=[("active", config["cor"])])
 
 
 def criar_header(root):

@@ -70,8 +70,7 @@ def preparar_dados_grafico(itens_carteira, taxas_indicadores, anos, ano_inicio=N
             "ganho":            round(ganho, 2),
             "percentual_ganho": round(pct, 1),
             "taxa_exibicao":    taxa_exibicao,
-            "cor_rgb":          config["cor_rgb"],
-            "cor_hex":          config["cor_hex"],
+            "cor":          config["cor"],
         })
 
     return resultados

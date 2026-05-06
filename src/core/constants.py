@@ -16,27 +16,27 @@ BLUE_D   = "#2952B8"
 INVESTIMENTOS = {
     "SELIC": {
         "nome_exibicao": "Tesouro Selic",
-        "cor_rgb": "#3B6FE0",
+        "cor": "#3B6FE0",
     },
     "CDI": {
         "nome_exibicao": "CDB 100% CDI",
-        "cor_rgb": "#DC4437",
+        "cor": "#DC4437",
     },
     "IPCA": {
         "nome_exibicao": "Tesouro IPCA+",
-        "cor_rgb": "#16A34A",
+        "cor": "#16A34A",
     },
     "POUPANCA": {
         "nome_exibicao": "Poupança",
-        "cor_rgb": "#9333EA",
+        "cor": "#9333EA",
     },
     "IGPM": {
         "nome_exibicao": "IGP-M",
-        "cor_rgb": "#EAB308",
+        "cor": "#EAB308",
     },
     "CAMBIO": {
         "nome_exibicao": "Dólar",
-        "cor_rgb": "#14B8A6",
+        "cor": "#14B8A6",
     },
 }
 
