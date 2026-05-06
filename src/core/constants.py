@@ -1,8 +1,8 @@
 """
-constants.py — Constantes e configurações globais do simulador.
+constants.py — Constantes e configurações globais
 """
 
-# Cores do tema
+# Cores
 BG       = "#F7F5F2"
 PANEL    = "#FFFFFF"
 BORDER   = "#E8E5DE"
@@ -16,27 +16,27 @@ BLUE_D   = "#2952B8"
 INVESTIMENTOS = {
     "SELIC": {
         "nome_exibicao": "Tesouro Selic",
-        "cor":       "#3B6FE0",
+        "cor": "#3B6FE0",
     },
     "CDI": {
         "nome_exibicao": "CDB 100% CDI",
-        "cor":       "#DC4437",
+        "cor": "#DC4437",
     },
     "IPCA": {
         "nome_exibicao": "Tesouro IPCA+",
-        "cor":       "#16A34A",
+        "cor": "#16A34A",
     },
     "POUPANCA": {
         "nome_exibicao": "Poupança",
-        "cor":       "#9333EA",
+        "cor": "#9333EA",
     },
     "IGPM": {
         "nome_exibicao": "IGP-M",
-        "cor":       "#EAB308",
+        "cor": "#EAB308",
     },
     "CAMBIO": {
         "nome_exibicao": "Dólar",
-        "cor":       "#14B8A6",
+        "cor": "#14B8A6",
     },
 }
 
