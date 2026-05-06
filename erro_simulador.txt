@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/Users/pedro/Desktop/proj tematico/invest-sim-desktop/src/main.py", line 115, in <module>
+    app = App()
+  File "/Users/pedro/Desktop/proj tematico/invest-sim-desktop/src/main.py", line 47, in __init__
+    self._recalcular()
+    ~~~~~~~~~~~~~~~~^^
+  File "/Users/pedro/Desktop/proj tematico/invest-sim-desktop/src/main.py", line 69, in _recalcular
+    self._dados_grafico = preparar_dados_grafico(
+                          ~~~~~~~~~~~~~~~~~~~~~~^
+        self._carteira, self._taxas, self._anos_var.get(),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/pedro/Desktop/proj tematico/invest-sim-desktop/src/core/calculator.py", line 74, in preparar_dados_grafico
+    "cor_hex":          config["cor_hex"],
+                        ~~~~~~^^^^^^^^^^^
+KeyError: 'cor_hex'
