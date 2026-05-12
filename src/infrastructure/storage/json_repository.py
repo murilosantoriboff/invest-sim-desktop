@@ -1,4 +1,6 @@
-#json_repository.py — Persistencia local em arquivos JSON.
+"""
+json_repository.py — Persistência local em arquivos JSON.
+"""
 
 import json
 import os
@@ -12,12 +14,12 @@ CACHE_TAXAS_PATH = os.path.join(_DATA_DIR, "cache_taxas.json")
 
 
 def _garantir_diretorio():
-    """Cria o diretório data/ se não existir."""
     os.makedirs(os.path.dirname(CARTEIRA_PATH), exist_ok=True)
 
 
-def salvar_carteira(itens: list[dict]) -> None:
+# ── Carteira ──────────────────────────────────────────────────────────────────
 
+def salvar_carteira(itens):
     _garantir_diretorio()
     dados = {
         "atualizado_em": datetime.now().isoformat(),
@@ -27,17 +29,14 @@ def salvar_carteira(itens: list[dict]) -> None:
         json.dump(dados, f, ensure_ascii=False, indent=2)
 
 
-def carregar_carteira() -> list[dict]:
-
+def carregar_carteira():
     if not os.path.exists(CARTEIRA_PATH):
         return []
     try:
         with open(CARTEIRA_PATH, "r", encoding="utf-8") as f:
             dados = json.load(f)
-        itens = dados.get("itens", [])
-
         validados = []
-        for item in itens:
+        for item in dados.get("itens", []):
             if "cod_investimento" in item and "valor" in item:
                 validados.append({
                     "cod_investimento": str(item["cod_investimento"]),
@@ -48,14 +47,14 @@ def carregar_carteira() -> list[dict]:
         return []
 
 
-def limpar_carteira() -> None:
-    
+def limpar_carteira():
     if os.path.exists(CARTEIRA_PATH):
         os.remove(CARTEIRA_PATH)
 
 
-def salvar_cache_taxas(indicadores: list[dict]) -> None:
+# ── Cache de taxas ────────────────────────────────────────────────────────────
 
+def salvar_cache_taxas(indicadores):
     _garantir_diretorio()
     dados = {
         "atualizado_em": datetime.now().isoformat(),
@@ -65,8 +64,7 @@ def salvar_cache_taxas(indicadores: list[dict]) -> None:
         json.dump(dados, f, ensure_ascii=False, indent=2)
 
 
-def carregar_cache_taxas() -> list[dict]:
-
+def carregar_cache_taxas():
     if not os.path.exists(CACHE_TAXAS_PATH):
         return []
     try:
@@ -77,11 +75,11 @@ def carregar_cache_taxas() -> list[dict]:
         return []
 
 
-def cache_taxas_existe() -> bool:
+def cache_taxas_existe():
     return os.path.exists(CACHE_TAXAS_PATH)
 
 
-def data_cache_taxas() -> str | None:
+def data_cache_taxas():
     if not os.path.exists(CACHE_TAXAS_PATH):
         return None
     try:

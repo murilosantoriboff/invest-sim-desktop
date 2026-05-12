@@ -1,23 +1,26 @@
 """
-main.py — Ponto de entrada do Simulador.
+main.py — Ponto de entrada do Simulador de Investimentos.
+
+Rodar de dentro da pasta src/:
+    cd src
+    python main.py
 """
 
 import sys
 import os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import tkinter as tk
 import traceback
-import sys
 
-from src.core.constants import BG, PANEL, INVESTIMENTOS, PRAZO_MIN, PRAZO_MAX, PRAZO_DEFAULT
-from src.core.calculator import preparar_dados_grafico
-from src.infrastructure.storage.json_repository import (
+# Garante que 'src/' está no path pra todos os imports funcionarem
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from core.constants import BG, PANEL, INVESTIMENTOS, PRAZO_MIN, PRAZO_MAX, PRAZO_DEFAULT
+from core.calculator import preparar_dados_grafico
+from infrastructure.storage.json_repository import (
     salvar_carteira, carregar_carteira,
     salvar_cache_taxas, carregar_cache_taxas,
 )
-from src.ui.frames import (
+from ui.frames import (
     configurar_estilos, criar_header, criar_input_panel,
     criar_area_grafico, desenhar_grafico, atualizar_legenda,
     criar_chips_bar, atualizar_chips,

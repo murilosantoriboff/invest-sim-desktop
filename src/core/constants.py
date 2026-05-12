@@ -1,5 +1,5 @@
 """
-constants.py — Constantes e configurações globais
+constants.py — Constantes e configurações globais do simulador.
 """
 
 # Cores
@@ -12,7 +12,7 @@ GREEN    = "#16A34A"
 BLUE     = "#3B6FE0"
 BLUE_D   = "#2952B8"
 
-# Investimentos disponíveis
+# Investimentos disponíveis (códigos alinhados com a vw_indicadores_investimento)
 INVESTIMENTOS = {
     "SELIC": {
         "nome_exibicao": "Tesouro Selic",
@@ -41,15 +41,12 @@ INVESTIMENTOS = {
 }
 
 # Gráfico
-CV_W     = 500
-CV_H     = 500
-CX       = CV_W // 2
-CY       = CV_H // 2
-R_EXT    = 180
-R_INT    = 100
-
-R_HOLE   = 86
-R_PRINC  = 152
+CV_W  = 500
+CV_H  = 500
+CX    = CV_W // 2
+CY    = CV_H // 2
+R_EXT = 180
+R_INT = 100
 
 # Prazo
 PRAZO_MIN = 1

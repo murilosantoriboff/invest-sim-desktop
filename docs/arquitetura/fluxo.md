@@ -2,8 +2,6 @@
 
 ## Caminho dos dados no sistema
 
-O simulador conecta três camadas independentes num fluxo único:
-
 ```
 Supabase (API BCB)
     │
@@ -22,55 +20,52 @@ supabase_client.buscar_indicadores()
             dados prontos pro gráfico
                     │
                     ▼
-            canvas_render (semana 5)
+            frames.desenhar_grafico()
 ```
 
 ## Detalhamento
 
 ### 1. Obter taxas
 
-Na inicialização, o sistema tenta buscar as taxas do Supabase via `buscar_indicadores()`. Se conseguir, salva no cache local com `salvar_cache_taxas()` pra ter os dados disponíveis offline. Se falhar (sem internet, erro de API), carrega do cache com `carregar_cache_taxas()`.
+Na inicialização, o sistema tenta buscar as taxas do Supabase via `buscar_indicadores()`. Se conseguir, salva no cache local com `salvar_cache_taxas()`. Se falhar (sem internet, erro de API), carrega do cache com `carregar_cache_taxas()`.
 
 ### 2. Carregar carteira
 
-A carteira do usuário é carregada do arquivo local com `carregar_carteira()`. Retorna lista vazia se for a primeira vez.
+A carteira do usuário é carregada do JSON local com `carregar_carteira()`. Retorna lista vazia se for a primeira vez.
 
 ### 3. Calcular projeções
 
-`preparar_dados_grafico()` recebe a carteira e as taxas, aplica juros compostos ano a ano com taxas variáveis, e retorna uma lista com tudo que o gráfico precisa: valor investido, valor futuro, ganho, percentual, cores.
+`preparar_dados_grafico()` recebe a carteira e as taxas, aplica juros compostos ano a ano com taxas variáveis, e retorna uma lista com tudo que o gráfico precisa.
 
 `calcular_totais()` agrega os valores da carteira inteira.
 
 ### 4. Interações do usuário
 
-Cada ação do usuário dispara um recálculo:
-
 | Ação | O que acontece |
 |---|---|
-| Adicionar investimento | Insere na carteira → `salvar_carteira()` → recalcula |
-| Remover investimento | Remove da carteira → `salvar_carteira()` → recalcula |
-| Mudar prazo | Recalcula com novo número de anos |
-
-A carteira é persistida a cada alteração pra sobreviver ao fechamento do app.
+| Adicionar investimento | Insere na carteira → salva JSON → recalcula → redesenha |
+| Remover investimento | Remove da carteira → salva JSON → recalcula → redesenha |
+| Mudar prazo | Recalcula com novo prazo → redesenha |
 
 ## Módulos envolvidos
 
 | Camada | Módulo | Papel |
 |---|---|---|
 | Persistência remota | `supabase_client.py` | Busca taxas do Supabase |
-| Persistência local | `json_repository.py` | Cache de taxas + carteira do usuário |
-| Regra de negócio | `calculator.py` | Projeção financeira + dados do gráfico |
-| Configuração | `constants.py` | Mapeamento de investimentos e cores |
+| Persistência local | `json_repository.py` | Cache de taxas + carteira |
+| Regra de negócio | `calculator.py` | Projeção financeira |
+| Configuração | `constants.py` | Investimentos e cores |
+| Interface | `frames.py` | Gráfico e interação |
 
 ## Validação
 
-`src/tests/testar_integracao.py` testa o fluxo completo em dois cenários:
+`src/tests/testar_integracao.py` testa o fluxo completo:
 
-- **Online**: busca do Supabase real → salva cache → calcula (pula se a lib não estiver instalada)
-- **Offline**: usa cache simulado → salva/carrega carteira → calcula → simula adicionar/remover investimentos e mudar prazo
+- **Online**: busca do Supabase → salva cache → calcula
+- **Offline**: cache simulado → salva/carrega carteira → calcula → adicionar/remover
 
-Rodar: `python src/tests/testar_integracao.py`
+Rodar a partir de `src/`: `python tests/testar_integracao.py`
 
 ---
 
-*Última atualização: Semana 4 — 28/04/2026*
+*Última atualização: Semana 5 — 05/05/2026*

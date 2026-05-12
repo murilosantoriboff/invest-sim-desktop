@@ -2,9 +2,9 @@
 
 ## Descrição
 
-O simulador é uma aplicação desktop feita em Python e que roda localmente... A interface, os cálculos e o arquivo de dados ficam na própria máquina do usuário. A ideia central é simples: o usuário informa um valor e um tipo de investimento, e o sistema desenha um gráfico mostrando quanto esse dinheiro vai render ao longo do tempo.
+O simulador é uma aplicação desktop feita em Python que roda localmente. A interface, os cálculos e o arquivo de dados ficam na própria máquina do usuário. O usuário informa um valor e um tipo de investimento, e o sistema desenha um gráfico mostrando quanto esse dinheiro vai render ao longo do tempo.
 
-A aplicação roda localmente como um programa desktop através de Python/Tkinter. Os dados de mercado (taxas Selic, CDI, IPCA) vêm do Supabase, que por sua vez é alimentado diariamente pela API pública do Banco Central do Brasil. A carteira do usuário fica salva num arquivo JSON local.
+Os dados de mercado (taxas Selic, CDI, IPCA) vêm do Supabase, que é alimentado diariamente pela API pública do Banco Central do Brasil. A carteira do usuário fica salva num arquivo JSON local.
 
 ---
 
@@ -12,9 +12,9 @@ A aplicação roda localmente como um programa desktop através de Python/Tkinte
 
 ### Camada de Apresentação — `src/ui/`
 
-Responsável por tudo que o usuário vê e com o que interage.
+Responsável por tudo que o usuário vê e interage.
 
-- `frames.py` — monta as telas do Tkinter, gerencia os eventos (cliques, digitação, mudança de prazo)
+- `frames.py` — monta as telas do Tkinter (header, painel de input, gráfico de rosca, legenda, chips da carteira), configura os estilos visuais e gerencia os eventos
 
 Essa camada não faz cálculo nenhum e não acessa banco de dados. Ela só chama a camada de negócio e exibe o resultado.
 
@@ -22,8 +22,8 @@ Essa camada não faz cálculo nenhum e não acessa banco de dados. Ela só chama
 
 O coração do sistema. Aqui ficam os cálculos e as regras.
 
-- `calculator.py` — implementa a fórmula de juros compostos, calcula projeção de rendimento, gera os dados geométricos para o gráfico
-- `constants.py` — constantes globais: dimensões do canvas, configurações de animação, mapeamento de nomes de investimentos
+- `calculator.py` — implementa juros compostos com taxas variáveis por ano, prepara os dados pro gráfico, calcula totais da carteira
+- `constants.py` — constantes globais: dimensões do canvas, cores, mapeamento de investimentos
 
 Nenhuma dependência de Tkinter ou Supabase aqui. Funções puras, fáceis de testar.
 
@@ -31,8 +31,8 @@ Nenhuma dependência de Tkinter ou Supabase aqui. Funções puras, fáceis de te
 
 Cuida de ler e gravar dados, seja na nuvem ou localmente.
 
-- `database/supabase_client.py` — conecta ao Supabase e consulta a view `vw_indicadores_investimento` para obter as taxas atualizadas
-- `storage/json_repository.py` — salva e carrega a carteira do usuário em `carteira.json` no diretório local
+- `database/supabase_client.py` — conecta ao Supabase e consulta a view `vw_indicadores_investimento`
+- `storage/json_repository.py` — salva e carrega a carteira do usuário e o cache de taxas em arquivos JSON locais
 
 ---
 
@@ -40,11 +40,9 @@ Cuida de ler e gravar dados, seja na nuvem ou localmente.
 
 O PostgreSQL no Supabase tem duas tabelas e uma view:
 
-`cfg_indicadores_investimento` — configuração estática: quais indicadores do BCB fazem parte do simulador, nome de exibição, como calcular as taxas derivadas.
-
-`stg_indicadores_bcb` — dados brutos da API Focus/BCB, atualizados diariamente por uma Edge Function com pg_cron.
-
-`vw_indicadores_investimento` — view que junta as duas tabelas e já entrega as taxas prontas para o simulador (CDI como % da Selic, Poupança como 70% da Selic quando Selic > 8.5%, etc.).
+- `cfg_indicadores_investimento` — configuração estática dos investimentos disponíveis
+- `stg_indicadores_bcb` — dados brutos da API Focus/BCB, atualizados diariamente por Edge Function
+- `vw_indicadores_investimento` — view que junta as duas tabelas e entrega as taxas prontas (CDI derivado da Selic, Poupança calculada conforme regra, etc.)
 
 O simulador só lê dessa view. Nunca escreve nada no Supabase.
 
@@ -54,18 +52,18 @@ O simulador só lê dessa view. Nunca escreve nada no Supabase.
 
 ```
 Usuário abre o app
-  └── supabase_client busca taxas na vw_indicadores_investimento
-        └── [sem conexão] usa taxas do cache local (json)
-  └── json_repository carrega carteira salva (se existir)
+  └── supabase_client busca taxas
+        └── [sem conexão] usa cache local
+  └── json_repository carrega carteira salva
 
 Usuário adiciona investimento
-  └── frames.py captura input → valida → chama calculator.py
-        └── calculator calcula projeção com taxa do Supabase
-  └── canvas_render.py recebe dados e desenha o gráfico animado
-  └── json_repository salva carteira atualizada
+  └── frames.py captura input → valida
+  └── calculator.py calcula projeção
+  └── frames.py desenha gráfico e legenda
+  └── json_repository salva carteira
 
 Usuário muda prazo
-  └── calculator recalcula → canvas_render redesenha (sem animação de entrada)
+  └── calculator recalcula → frames redesenha
 ```
 
 ---
@@ -73,17 +71,18 @@ Usuário muda prazo
 ## Relação entre componentes
 
 ```
-frames.py
-  ├── chama → calculator.py (para projeções)
-  ├── chama → canvas_render.py (para desenhar)
+main.py (orquestrador)
+  ├── chama → frames.py (interface)
+  ├── chama → calculator.py (projeções)
   ├── chama → supabase_client.py (taxas na inicialização)
-  └── chama → json_repository.py (salvar/carregar carteira)
+  └── chama → json_repository.py (salvar/carregar carteira e cache)
 
 calculator.py
-  └── depende de → constants.py (configurações)
+  └── depende de → constants.py (mapeamento de investimentos)
 
-canvas_render.py
-  └── depende de → constants.py (dimensões, cores)
+frames.py
+  └── depende de → constants.py (cores, dimensões)
+  └── depende de → calculator.py (calcular_totais para o gráfico)
 ```
 
 ---
@@ -96,4 +95,4 @@ Link: https://www.figma.com/board/nN0JSuSVPB9LzBQh5qHSJh/Hist%C3%B3rias-de-Usu%C
 
 ---
 
-*Última atualização: Semana 1 — 07/04/2026*
+*Última atualização: Semana 5 — 05/05/2026*

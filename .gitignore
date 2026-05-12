@@ -9,5 +9,5 @@ dist/
 build/
 .venv/
 venv/
-.data
 data/
+erro_simulador.txt

@@ -2,10 +2,7 @@
 calculator.py — Cálculos financeiros e preparação de dados para o gráfico.
 """
 
-try:
-    from src.core.constants import INVESTIMENTOS
-except ModuleNotFoundError:
-    from core.constants import INVESTIMENTOS, R_HOLE, R_PRINC
+from core.constants import INVESTIMENTOS
 
 
 def projetar_valor(valor, taxas_por_ano, ano_inicio, anos):
@@ -70,7 +67,7 @@ def preparar_dados_grafico(itens_carteira, taxas_indicadores, anos, ano_inicio=N
             "ganho":            round(ganho, 2),
             "percentual_ganho": round(pct, 1),
             "taxa_exibicao":    taxa_exibicao,
-            "cor":          config["cor"],
+            "cor":              config["cor"],
         })
 
     return resultados
@@ -88,12 +85,6 @@ def calcular_totais(dados_grafico):
         "total_ganho":            round(total_ganho, 2),
         "percentual_ganho_total": round(pct, 1),
     }
-
-
-def calcular_raio_ganho(ganho, valor_base):
-    espessura = R_PRINC - R_HOLE
-    ratio = ganho / valor_base if valor_base > 0 else 0
-    return R_PRINC + ratio * espessura
 
 
 def _organizar_taxas(taxas_indicadores):

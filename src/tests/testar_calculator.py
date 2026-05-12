@@ -1,7 +1,7 @@
 """
 testar_calculator.py — Testa o calculator.py.
 
-Rodar a partir da raiz: python src/tests/testar_calculator.py
+Rodar a partir de src/: python tests/testar_calculator.py
 """
 
 import sys
@@ -47,7 +47,7 @@ def main():
 
     taxas_selic = {2026: 14.75, 2027: 14.75, 2028: 14.75, 2029: 14.75, 2030: 14.75}
     resultado = projetar_valor(10000, taxas_selic, 2026, 5)
-    teste("R$ 10.000 a 14.75% fixo por 5 anos ≈ R$ 19.895",
+    teste("R$ 10.000 a 14.75% fixo por 5 anos",
           aprox(resultado, 19895.89, 1.0))
 
     teste("Taxa 0% não altera o valor",
@@ -61,21 +61,17 @@ def main():
 
     taxas_var = {2026: 14.75, 2027: 12.50, 2028: 10.00}
 
-    resultado_1 = projetar_valor(10000, taxas_var, 2026, 1)
-    teste("1 ano (14.75%) ≈ R$ 11.475",
-          aprox(resultado_1, 11475.0))
+    teste("1 ano variável (14.75%)",
+          aprox(projetar_valor(10000, taxas_var, 2026, 1), 11475.0))
 
-    resultado_2 = projetar_valor(10000, taxas_var, 2026, 2)
-    teste("2 anos (14.75% + 12.50%) ≈ R$ 12.909",
-          aprox(resultado_2, 12909.37, 1.0))
+    teste("2 anos variáveis (14.75% + 12.50%)",
+          aprox(projetar_valor(10000, taxas_var, 2026, 2), 12909.37, 1.0))
 
-    resultado_3 = projetar_valor(10000, taxas_var, 2026, 3)
-    teste("3 anos (14.75% + 12.50% + 10.00%) ≈ R$ 14.200",
-          aprox(resultado_3, 14200.31, 1.0))
+    teste("3 anos variáveis",
+          aprox(projetar_valor(10000, taxas_var, 2026, 3), 14200.31, 1.0))
 
-    resultado_5 = projetar_valor(10000, taxas_var, 2026, 5)
-    teste("5 anos (3 taxas + 2 flat a 10%) ≈ R$ 17.182",
-          aprox(resultado_5, 17182.38, 2.0))
+    teste("5 anos (3 taxas + 2 flat a 10%)",
+          aprox(projetar_valor(10000, taxas_var, 2026, 5), 17182.38, 2.0))
 
     print("\n--- Auxiliares ---\n")
 
@@ -129,9 +125,8 @@ def main():
 
     dados_sem = preparar_dados_grafico(
         [{"cod_investimento": "SELIC", "valor": 10000.0}], [], anos=5)
-    teste("Sem taxas → valor futuro = valor", dados_sem[0]["valor_futuro"] == 10000.0)
+    teste("Sem taxas = valor original", dados_sem[0]["valor_futuro"] == 10000.0)
 
-    
     print("\n--- Totais ---\n")
 
     totais = calcular_totais(dados)
@@ -139,7 +134,6 @@ def main():
     teste("Total futuro > investido", totais["total_futuro"] > totais["total_investido"])
     teste("Ganho > 0", totais["total_ganho"] > 0)
 
-    
     print("\n" + "=" * 60)
     print(f"RESULTADO: {passed} passaram, {failed} falharam")
     print("=" * 60)

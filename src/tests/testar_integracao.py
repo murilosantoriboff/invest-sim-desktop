@@ -1,7 +1,7 @@
 """
 testar_integracao.py — Fluxo completo: persistência + regra de negócio.
 
-Rodar a partir da raiz: python src/tests/testar_integracao.py
+Rodar a partir de src/: python tests/testar_integracao.py
 """
 
 import sys
@@ -69,11 +69,6 @@ def fluxo_com_supabase():
     totais = calcular_totais(dados)
     teste("Total futuro > investido", totais["total_futuro"] > totais["total_investido"])
 
-    print(f"\n  Resultado:")
-    for d in dados:
-        print(f"    {d['nome_exibicao']}: R$ {d['valor']:,.0f} → R$ {d['valor_futuro']:,.2f} (+{d['percentual_ganho']:.1f}%)")
-    print()
-
 
 def fluxo_com_cache():
     print("\n--- Fluxo com cache local (offline) ---\n")
@@ -116,12 +111,12 @@ def fluxo_com_cache():
 
     carteira.pop(2)
     salvar_carteira(carteira)
-    carteira = carregar_carteira()
-    teste("Após remover, 2 itens", len(carteira) == 2)
+    teste("Após remover, 2 itens", len(carregar_carteira()) == 2)
 
-    dados2 = preparar_dados_grafico(carteira, taxas, anos=5, ano_inicio=2025)
+    dados2 = preparar_dados_grafico(carregar_carteira(), taxas, anos=5, ano_inicio=2025)
     teste("Gráfico com 2 itens", len(dados2) == 2)
 
+    carteira = carregar_carteira()
     carteira.append({"cod_investimento": "IPCA", "valor": 7000.0})
     salvar_carteira(carteira)
     dados3 = preparar_dados_grafico(carregar_carteira(), taxas, anos=10, ano_inicio=2025)

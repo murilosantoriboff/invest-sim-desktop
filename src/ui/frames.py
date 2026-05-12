@@ -1,22 +1,15 @@
 """
-frames.py — Interface do simulador (Tkinter puro, sem dependências externas).
+frames.py — Interface do simulador (Tkinter puro).
 """
 
 import tkinter as tk
 from tkinter import ttk
 
-try:
-    from src.core.constants import (
-        INVESTIMENTOS, BG, PANEL, BORDER, TXT, TXT_SEC, BLUE, BLUE_D, GREEN,
-        CV_W, CV_H, CX, CY, R_EXT, R_INT,
-    )
-    from src.core.calculator import calcular_totais
-except ModuleNotFoundError:
-    from core.constants import (
-        INVESTIMENTOS, BG, PANEL, BORDER, TXT, TXT_SEC, BLUE, BLUE_D, GREEN,
-        CV_W, CV_H, CX, CY, R_EXT, R_INT,
-    )
-    from core.calculator import calcular_totais
+from core.constants import (
+    INVESTIMENTOS, BG, PANEL, BORDER, TXT, TXT_SEC, BLUE, BLUE_D, GREEN,
+    CV_W, CV_H, CX, CY, R_EXT, R_INT,
+)
+from core.calculator import calcular_totais
 
 
 def configurar_estilos():
@@ -145,8 +138,7 @@ def desenhar_grafico(canvas, dados_grafico, anos):
     total_valor = sum(d["valor"] for d in dados_grafico)
     totais = calcular_totais(dados_grafico)
 
-    # desenhar arcos da rosca
-    start = 90  # começa do topo
+    start = 90
     gap = 2 if len(dados_grafico) > 1 else 0
 
     for d in dados_grafico:
@@ -156,7 +148,6 @@ def desenhar_grafico(canvas, dados_grafico, anos):
             start -= frac * 360
             continue
 
-        # anel principal
         canvas.create_arc(
             CX - R_EXT, CY - R_EXT, CX + R_EXT, CY + R_EXT,
             start=start, extent=-extent,
@@ -164,13 +155,11 @@ def desenhar_grafico(canvas, dados_grafico, anos):
         )
         start -= frac * 360
 
-    # furo central (cria o efeito rosca)
     canvas.create_oval(
         CX - R_INT, CY - R_INT, CX + R_INT, CY + R_INT,
         fill=BG, outline=BG
     )
 
-    # textos no centro
     canvas.create_text(CX, CY - 20,
                        text=f"R$ {totais['total_investido']:,.0f}",
                        font=("Arial", 16, "bold"), fill=TXT)
@@ -197,13 +186,11 @@ def atualizar_legenda(legenda, dados_grafico):
         item_f = tk.Frame(legenda, bg=BG)
         item_f.pack(anchor="w", pady=4, fill="x")
 
-        # bolinha de cor + nome
         tk.Label(item_f, text="●", font=("Arial", 12),
                  bg=BG, fg=d["cor"]).pack(side="left")
         tk.Label(item_f, text=f"  {d['nome_exibicao']}",
                  font=("Arial", 10, "bold"), bg=BG, fg=TXT).pack(side="left")
 
-        # valores
         vals_f = tk.Frame(legenda, bg=BG)
         vals_f.pack(anchor="w", padx=(18, 0), pady=(0, 6))
 
