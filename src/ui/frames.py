@@ -7,7 +7,7 @@ from tkinter import ttk
 
 from core.constants import (
     INVESTIMENTOS, BG, PANEL, BORDER, TXT, TXT_SEC, BLUE, BLUE_D, GREEN,
-    CV_W, CV_H, CX, CY, R_EXT, R_INT,
+    CV_W, CV_H, CX, CY, R_EXT, R_INT, CARD_W, CARD_COLS, formatar_brl,
 )
 from core.calculator import calcular_totais
 
@@ -30,7 +30,7 @@ def configurar_estilos():
           background=[("active", BLUE_D)])
 
     s.configure("Step.TButton", font=("Arial", 12, "bold"),
-                relief="flat", borderwidth=0, padding=(6, 2),
+                relief="flat", borderwidth=0, padding=(4, 2),
                 background=BORDER, foreground=TXT)
     s.map("Step.TButton",
           background=[("active", "#D4D4D4")])
@@ -52,6 +52,12 @@ def criar_header(root):
              font=("Arial", 9), bg=BG, fg=TXT_SEC).pack(anchor="w")
 
 
+def _validar_valor(novo_texto):
+    if novo_texto == "":
+        return True
+    return novo_texto.isdigit()
+
+
 def criar_input_panel(root, tipo_var, anos_var, on_adicionar, on_mudar_anos):
     tk.Frame(root, bg=BORDER, height=1).pack(fill="x")
     painel = tk.Frame(root, bg=PANEL)
@@ -59,7 +65,6 @@ def criar_input_panel(root, tipo_var, anos_var, on_adicionar, on_mudar_anos):
     inner = tk.Frame(painel, bg=PANEL)
     inner.pack(padx=30, pady=14, anchor="w")
 
-    # tipo
     tk.Label(inner, text="Tipo", font=("Arial", 10, "bold"),
              bg=PANEL, fg=TXT).grid(row=0, column=0, sticky="w", padx=(0, 20))
     pill_f = tk.Frame(inner, bg=PANEL)
@@ -81,30 +86,33 @@ def criar_input_panel(root, tipo_var, anos_var, on_adicionar, on_mudar_anos):
         pill_btns[cod] = b
     selecionar(primeiro)
 
-    # valor
     tk.Label(inner, text="Valor (R$)", font=("Arial", 10, "bold"),
              bg=PANEL, fg=TXT).grid(row=0, column=1, sticky="w", padx=(0, 20))
+    vcmd = (root.register(_validar_valor), "%P")
     valor_entry = tk.Entry(inner, width=12, font=("Arial", 12),
-                           bg=PANEL, fg=TXT, relief="solid", bd=1)
+                           bg=PANEL, fg=TXT, relief="solid", bd=1,
+                           validate="key", validatecommand=vcmd)
     valor_entry.insert(0, "10000")
     valor_entry.grid(row=1, column=1, sticky="w", padx=(0, 20))
     valor_entry.bind("<Return>", lambda e: on_adicionar())
 
-    # prazo
     tk.Label(inner, text="Prazo", font=("Arial", 10, "bold"),
              bg=PANEL, fg=TXT).grid(row=0, column=2, sticky="w", padx=(0, 20))
     prazo_f = tk.Frame(inner, bg=PANEL)
     prazo_f.grid(row=1, column=2, sticky="w", padx=(0, 20))
-    ttk.Button(prazo_f, text="−", style="Step.TButton",
-               command=lambda: on_mudar_anos(-1)).pack(side="left")
+    tk.Button(prazo_f, text="−", font=("Arial", 12, "bold"),
+    	bg=BORDER, fg=TXT, relief="flat", bd=0,
+        width=4, cursor="hand2",
+        command=lambda: on_mudar_anos(-1)).pack(side="left")
     tk.Label(prazo_f, textvariable=anos_var, font=("Arial", 14, "bold"),
              bg=PANEL, fg=TXT, width=3, anchor="center").pack(side="left")
     tk.Label(prazo_f, text="anos", font=("Arial", 9),
              bg=PANEL, fg=TXT_SEC).pack(side="left", padx=(2, 0))
-    ttk.Button(prazo_f, text="+", style="Step.TButton",
-               command=lambda: on_mudar_anos(+1)).pack(side="left")
+    tk.Button(prazo_f, text="+", font=("Arial", 12, "bold"),
+          	bg=BORDER, fg=TXT, relief="flat", bd=0,
+         	 width=4, cursor="hand2",
+          	command=lambda: on_mudar_anos(+1)).pack(side="left")
 
-    # botão
     ttk.Button(inner, text="Adicionar →", style="Add.TButton",
                cursor="hand2", command=on_adicionar).grid(row=1, column=3, sticky="w")
 
@@ -114,17 +122,54 @@ def criar_input_panel(root, tipo_var, anos_var, on_adicionar, on_mudar_anos):
 
 
 def criar_area_grafico(root):
+    """Gráfico à esquerda, grid de cards à direita com scroll condicional."""
     area = tk.Frame(root, bg=BG)
-    area.pack(fill="x", padx=30, pady=10)
+    area.pack(fill="both", expand=True, padx=30, pady=10)
 
+    # gráfico à esquerda
     canvas = tk.Canvas(area, width=CV_W, height=CV_H,
                        bg=BG, highlightthickness=0)
-    canvas.pack(side="left")
+    canvas.pack(side="left", anchor="n")
 
-    legenda = tk.Frame(area, bg=BG)
-    legenda.pack(side="left", fill="y", padx=(20, 0))
+    # lado direito: container com scroll condicional
+    right = tk.Frame(area, bg=BG)
+    right.pack(side="left", fill="both", expand=True, padx=(15, 0))
 
-    return canvas, legenda
+    scroll_canvas = tk.Canvas(right, bg=BG, highlightthickness=0)
+    scrollbar = ttk.Scrollbar(right, orient="vertical", command=scroll_canvas.yview)
+
+    legenda_frame = tk.Frame(scroll_canvas, bg=BG)
+
+    legenda_frame.bind("<Configure>", lambda e: _atualizar_scroll(scroll_canvas, scrollbar))
+    scroll_canvas.create_window((0, 0), window=legenda_frame, anchor="nw")
+    scroll_canvas.configure(yscrollcommand=scrollbar.set)
+
+    scroll_canvas.pack(side="left", fill="both", expand=True)
+    # scrollbar não é packada agora — só quando necessário
+
+    def _on_mousewheel(event):
+        scroll_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    scroll_canvas.bind("<MouseWheel>", _on_mousewheel)
+    legenda_frame.bind("<MouseWheel>", _on_mousewheel)
+
+    # guarda referências pro scroll condicional
+    legenda_frame._scroll_canvas = scroll_canvas
+    legenda_frame._scrollbar = scrollbar
+
+    return canvas, legenda_frame
+
+
+def _atualizar_scroll(scroll_canvas, scrollbar):
+    scroll_canvas.configure(scrollregion=scroll_canvas.bbox("all"))
+    scroll_canvas.update_idletasks()
+    content_h = scroll_canvas.bbox("all")
+    visible_h = scroll_canvas.winfo_height()
+    if content_h and visible_h > 1 and content_h[3] > visible_h:
+        scrollbar.pack(side="right", fill="y")
+    else:
+        scrollbar.pack_forget()
+        scroll_canvas.yview_moveto(0)
 
 
 def desenhar_grafico(canvas, dados_grafico, anos):
@@ -144,9 +189,13 @@ def desenhar_grafico(canvas, dados_grafico, anos):
     for d in dados_grafico:
         frac = d["valor"] / total_valor
         extent = frac * 360 - gap
+
         if extent < 1:
             start -= frac * 360
             continue
+
+        if extent >= 360:
+            extent = 359.9
 
         canvas.create_arc(
             CX - R_EXT, CY - R_EXT, CX + R_EXT, CY + R_EXT,
@@ -161,12 +210,12 @@ def desenhar_grafico(canvas, dados_grafico, anos):
     )
 
     canvas.create_text(CX, CY - 20,
-                       text=f"R$ {totais['total_investido']:,.0f}",
+                       text=formatar_brl(totais['total_investido']),
                        font=("Arial", 16, "bold"), fill=TXT)
     canvas.create_text(CX, CY + 2,
                        text="investido", font=("Arial", 9), fill=TXT_SEC)
     canvas.create_text(CX, CY + 24,
-                       text=f"+ R$ {totais['total_ganho']:,.0f}",
+                       text=f"+ {formatar_brl(totais['total_ganho'])}",
                        font=("Arial", 12, "bold"), fill=GREEN)
     canvas.create_text(CX, CY + 44,
                        text=f"em {anos} anos", font=("Arial", 9), fill=TXT_SEC)
@@ -179,44 +228,57 @@ def atualizar_legenda(legenda, dados_grafico):
     if not dados_grafico:
         return
 
-    tk.Label(legenda, text="Detalhamento", font=("Arial", 11, "bold"),
-             bg=BG, fg=TXT).pack(anchor="w", pady=(0, 8))
+    for i, d in enumerate(dados_grafico):
+        row = i // CARD_COLS
+        col = i % CARD_COLS
 
-    for d in dados_grafico:
-        item_f = tk.Frame(legenda, bg=BG)
-        item_f.pack(anchor="w", pady=4, fill="x")
+        card = tk.Frame(legenda, bg="#F0EEEB", padx=12, pady=10)
+        card.grid(row=row, column=col, padx=(0, 8), pady=(0, 8), sticky="nw")
 
-        tk.Label(item_f, text="●", font=("Arial", 12),
-                 bg=BG, fg=d["cor"]).pack(side="left")
-        tk.Label(item_f, text=f"  {d['nome_exibicao']}",
-                 font=("Arial", 10, "bold"), bg=BG, fg=TXT).pack(side="left")
+        # cabeçalho do card
+        header = tk.Frame(card, bg="#F0EEEB")
+        header.pack(anchor="w")
+        tk.Label(header, text="●", font=("Arial", 11),
+                 bg="#F0EEEB", fg=d["cor"]).pack(side="left")
+        tk.Label(header, text=f"  {d['nome_exibicao']}",
+                 font=("Arial", 10, "bold"), bg="#F0EEEB", fg=TXT).pack(side="left")
 
-        vals_f = tk.Frame(legenda, bg=BG)
-        vals_f.pack(anchor="w", padx=(18, 0), pady=(0, 6))
+        # valores
+        tk.Label(card, text=f"Investido: {formatar_brl(d['valor'])}",
+                 font=("Arial", 9), bg="#F0EEEB", fg=TXT_SEC).pack(anchor="w", pady=(6, 0))
+        tk.Label(card, text=f"Projeção: {formatar_brl(d['valor_futuro'])}",
+                 font=("Arial", 9), bg="#F0EEEB", fg=TXT).pack(anchor="w")
+        tk.Label(card, text=f"Ganho: + {formatar_brl(d['ganho'])} ({d['percentual_ganho']:.1f}%)",
+                 font=("Arial", 9), bg="#F0EEEB", fg=GREEN).pack(anchor="w")
+        tk.Label(card, text=f"Taxa: {d['taxa_exibicao']:.2f}% a.a.",
+                 font=("Arial", 9), bg="#F0EEEB", fg=TXT_SEC).pack(anchor="w")
 
-        tk.Label(vals_f, text=f"Investido: R$ {d['valor']:,.0f}",
-                 font=("Arial", 9), bg=BG, fg=TXT_SEC).pack(anchor="w")
-        tk.Label(vals_f, text=f"Projeção: R$ {d['valor_futuro']:,.0f}",
-                 font=("Arial", 9), bg=BG, fg=TXT).pack(anchor="w")
-        tk.Label(vals_f, text=f"Ganho: + R$ {d['ganho']:,.0f} ({d['percentual_ganho']:.1f}%)",
-                 font=("Arial", 9), bg=BG, fg=GREEN).pack(anchor="w")
-        tk.Label(vals_f, text=f"Taxa: {d['taxa_exibicao']:.2f}% a.a.",
-                 font=("Arial", 9), bg=BG, fg=TXT_SEC).pack(anchor="w")
+    # bind mousewheel nos cards novos
+    scroll_canvas = legenda._scroll_canvas
+    def _on_mousewheel(event):
+        scroll_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    for widget in legenda.winfo_children():
+        widget.bind("<MouseWheel>", _on_mousewheel)
+        for child in widget.winfo_children():
+            child.bind("<MouseWheel>", _on_mousewheel)
 
 
 def criar_chips_bar(root):
-    chip_outer = tk.Frame(root, bg=BG)
+    chip_outer = tk.Text(root, bg=BG, relief="flat", bd=0,
+                         height=4, cursor="arrow",
+                         wrap="word", state="disabled")
     chip_outer.pack(fill="x", padx=30, pady=(0, 10))
     return chip_outer
 
 
 def atualizar_chips(chip_outer, itens_carteira, on_remover):
-    for w in chip_outer.winfo_children():
-        w.destroy()
+    chip_outer.config(state="normal")
+    chip_outer.delete("1.0", "end")
 
     if not itens_carteira:
-        tk.Label(chip_outer, text="Nenhum investimento adicionado.",
-                 font=("Arial", 9), bg=BG, fg=TXT_SEC).pack(side="left")
+        chip_outer.insert("end", "Nenhum investimento adicionado.")
+        chip_outer.config(state="disabled")
         return
 
     for i, item in enumerate(itens_carteira):
@@ -225,13 +287,17 @@ def atualizar_chips(chip_outer, itens_carteira, on_remover):
             continue
 
         chip = tk.Frame(chip_outer, bg=PANEL, relief="solid", bd=1)
-        chip.pack(side="left", padx=(0, 6), pady=2)
 
+        valor_fmt = formatar_brl(item['valor'])
         tk.Label(chip, text="●", font=("Arial", 9),
                  bg=PANEL, fg=config["cor"], padx=6).pack(side="left")
-        tk.Label(chip, text=f"{config['nome_exibicao']} · R$ {item['valor']:,.0f}",
+        tk.Label(chip, text=f"{config['nome_exibicao']} · {valor_fmt}",
                  font=("Arial", 9), bg=PANEL, fg=TXT).pack(side="left")
         tk.Button(chip, text="×", font=("Arial", 9),
                   bg=PANEL, fg=TXT_SEC, relief="flat", bd=0,
                   cursor="hand2", padx=6,
                   command=lambda k=i: on_remover(k)).pack(side="left")
+
+        chip_outer.window_create("end", window=chip, padx=3, pady=2)
+
+    chip_outer.config(state="disabled")

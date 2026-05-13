@@ -11,7 +11,6 @@ import os
 import tkinter as tk
 import traceback
 
-# Garante que 'src/' está no path pra todos os imports funcionarem
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from core.constants import BG, PANEL, INVESTIMENTOS, PRAZO_MIN, PRAZO_MAX, PRAZO_DEFAULT
@@ -33,7 +32,6 @@ class App(tk.Tk):
         super().__init__()
         self.title("Simulador de Investimentos")
         self.configure(bg=BG)
-        self.resizable(False, False)
 
         self._taxas = []
         self._carteira = []
@@ -49,6 +47,18 @@ class App(tk.Tk):
         self._montar_ui()
         self._recalcular()
         self._redesenhar()
+
+        # tamanho da janela
+        self.update_idletasks()
+        screen_w = self.winfo_screenwidth()
+        screen_h = self.winfo_screenheight()
+        win_w = min(1280, screen_w - 100)
+        win_h = min(720, screen_h - 80)
+        x = (screen_w - win_w) // 2
+        y = (screen_h - win_h) // 2 - 20
+        self.geometry(f"{win_w}x{win_h}+{x}+{y}")
+        self.minsize(1280, 720)
+        self.resizable(True, True)
 
     def _carregar_taxas(self):
         try:

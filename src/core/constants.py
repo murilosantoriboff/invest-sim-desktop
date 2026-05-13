@@ -7,7 +7,7 @@ BG       = "#F7F5F2"
 PANEL    = "#FFFFFF"
 BORDER   = "#E8E5DE"
 TXT      = "#18181B"
-TXT_SEC  = "#A1A1AA"
+TXT_SEC  = "#71717A"
 GREEN    = "#16A34A"
 BLUE     = "#3B6FE0"
 BLUE_D   = "#2952B8"
@@ -41,14 +41,23 @@ INVESTIMENTOS = {
 }
 
 # Gráfico
-CV_W  = 500
-CV_H  = 500
+CV_W  = 400
+CV_H  = 400
 CX    = CV_W // 2
 CY    = CV_H // 2
-R_EXT = 180
-R_INT = 100
+R_EXT = 150
+R_INT = 85
+
+# Legenda grid
+CARD_W    = 200
+CARD_COLS = 4
 
 # Prazo
 PRAZO_MIN = 1
 PRAZO_MAX = 30
 PRAZO_DEFAULT = 5
+
+
+def formatar_brl(valor):
+    """Formata valor numérico pro padrão brasileiro (ponto como separador de milhar)."""
+    return f"R$ {valor:,.0f}".replace(",", ".")
