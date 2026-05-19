@@ -63,3 +63,49 @@ Valida o comportamento do componente `json_repository.py` na leitura, escrita e 
 ## 3. Testes de Integração Ponta a Ponta (`testar_integracao.py`)
 
 Estes testes validam a orquestração mútua dos componentes: o fluxo de dados saindo do banco de dados (ou cache), passando pelo repositório local, sendo processado pelo motor de cálculo e gerando os consolidados de saída.
+
+[Supabase / Cache] ──> [JSON Repository] ──> [Core Calculator] ──> [Métricas Globais]
+
+
+### 3.1 Fluxo Online (Com Conectividade Supabase)
+* **Cenário 1: Integração com Client API**
+  * **Objetivo:** Testar se a biblioteca cliente consegue se conectar com o cluster do Supabase, efetuar a autenticação/busca e retornar registros válidos de taxas macroeconômicas.
+* **Cenário 2: Atualização Automática de Cache**
+  * **Objetivo:** Garantir que os dados novos trazidos da API online sejam imediatamente salvos e reflitam de forma idêntica no cache offline local.
+* **Cenário 3: Validação Logística do Rendimento**
+  * **Objetivo:** Processar os dados reais obtidos contra uma carteira de testes por 5 anos e verificar a consistência básica do mercado (o valor futuro projetado deve ser estritamente maior que o valor investido original para ativos de renda fixa).
+
+### 3.2 Fluxo Offline (Baseado estritamente em Cache Local)
+* **Cenário 4: Simulação de Projeção Multiativos**
+  * **Objetivo:** Alimentar o sistema com dados fixados de 2025 a 2027 para múltiplos indexadores (SELIC, CDI, IPCA, POUPANÇA).
+  * **Validação:** 
+    * Validar se o total somado investido bate precisamente com a entrada (R$ 18.000,00).
+    * Testar o incremento dinâmico de prazos de projeção (passar de 5 para 10 anos) e auditar se a regra de negócio calcula corretamente o ganho exponencial proporcional ao aumento do tempo.
+
+---
+
+## 4. Matriz de Cobertura de Asserções
+
+Abaixo está o resumo volumétrico de verificações mínimas realizadas pelas suítes de teste:
+
+| Módulo de Teste | Foco Principal | Tipo de Abordagem | Asserções Principais |
+| :--- | :--- | :--- | :--- |
+| `testar_calculator.py` | Regras de cálculo e mutação de dados | Unitária / Matemática | Projeções cambiais/juros, tratamento de valores zerados, fallbacks de anos ausentes e aplicação de cores hexadecimais. |
+| `testar_persistencia.py` | Manipulação de arquivos I/O | Funcional / Caixa Preta | Escrita, leitura, isolamento de diretórios, deleção física e tratamento de exceção por quebra de sintaxe JSON. |
+| `testar_integracao.py` | Ciclo completo de dados da aplicação | Integração de Sistemas | Conectividade externa, persistência em cascata de dados baixados da nuvem e consistência financeira do motor sob prazos longos. |
+
+---
+
+## 5. Instruções para Execução
+
+Para rodar a suíte completa de validações funcionais, execute os comandos a partir da raiz da pasta `src/`:
+
+```bash
+# Executar testes unitários do motor de cálculo
+python tests/testar_calculator.py
+
+# Executar testes do repositório JSON local
+python tests/testar_persistencia.py
+
+# Executar teste de integração completa (Online/Offline)
+python tests/testar_integracao.py
