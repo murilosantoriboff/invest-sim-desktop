@@ -277,7 +277,8 @@ def atualizar_chips(chip_outer, itens_carteira, on_remover):
     chip_outer.delete("1.0", "end")
 
     if not itens_carteira:
-        chip_outer.insert("end", "Nenhum investimento adicionado.")
+        chip_outer.tag_config("placeholder", foreground=TXT)
+        chip_outer.insert("end", "Nenhum investimento adicionado.", "placeholder")
         chip_outer.config(state="disabled")
         return
 
