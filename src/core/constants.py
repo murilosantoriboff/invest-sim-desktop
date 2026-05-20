@@ -6,6 +6,7 @@ constants.py — Constantes e configurações globais do simulador.
 BG       = "#F7F5F2"
 PANEL    = "#FFFFFF"
 BORDER   = "#E8E5DE"
+HOVER    = "#D4D4D4"
 TXT      = "#18181B"
 TXT_SEC  = "#71717A"
 GREEN    = "#16A34A"

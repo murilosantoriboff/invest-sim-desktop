@@ -6,11 +6,17 @@ import tkinter as tk
 from tkinter import ttk
 
 from core.constants import (
-    INVESTIMENTOS, BG, PANEL, BORDER, TXT, TXT_SEC, BLUE, BLUE_D, GREEN, RED,
+    INVESTIMENTOS, BG, PANEL, BORDER, HOVER, TXT, TXT_SEC, BLUE, BLUE_D, GREEN, RED,
     CV_W, CV_H, CX, CY, R_EXT, R_INT, CARD_COLS, formatar_brl,
 )
 from core.calculator import calcular_totais
 from ui.tooltip import Tooltip, abrir_glossario
+
+
+def _adicionar_hover(widget, bg_normal=BORDER, bg_hover=HOVER):
+    """Escurece o fundo do widget ao passar o mouse (para tk.Button e tk.Label)."""
+    widget.bind("<Enter>", lambda _e: widget.config(bg=bg_hover), add="+")
+    widget.bind("<Leave>", lambda _e: widget.config(bg=bg_normal), add="+")
 
 
 def configurar_estilos():
@@ -21,7 +27,7 @@ def configurar_estilos():
                 relief="flat", borderwidth=0, padding=(10, 6),
                 background=BORDER, foreground=TXT_SEC)
     s.map("Pill.TButton",
-          background=[("active", "#D4D4D4")],
+          background=[("active", HOVER)],
           foreground=[("active", TXT)])
 
     s.configure("Add.TButton", font=("Arial", 10, "bold"),
@@ -51,14 +57,16 @@ def criar_header(root, data_atualizacao=None, on_exportar_pdf=None):
     )
     ajuda.pack(side="right", padx=(8, 0))
     ajuda.bind("<Button-1>", lambda _e: abrir_glossario(root))
+    _adicionar_hover(ajuda)
 
     if on_exportar_pdf is not None:
         btn_pdf = tk.Label(
             direita, text="Exportar PDF", font=("Arial", 9, "bold"),
-            bg=BLUE, fg="white", padx=10, pady=3, cursor="hand2",
+            bg=BORDER, fg=TXT, padx=10, pady=3, cursor="hand2",
         )
         btn_pdf.pack(side="right", padx=(8, 0))
         btn_pdf.bind("<Button-1>", lambda _e: on_exportar_pdf())
+        _adicionar_hover(btn_pdf)
         Tooltip(btn_pdf, "Exportar a simulação atual como PDF")
 
     if data_atualizacao:
@@ -127,18 +135,24 @@ def criar_input_panel(root, tipo_var, anos_var, on_adicionar, on_mudar_anos):
              bg=PANEL, fg=TXT).grid(row=0, column=2, sticky="w", padx=(0, 20))
     prazo_f = tk.Frame(inner, bg=PANEL)
     prazo_f.grid(row=1, column=2, sticky="w", padx=(0, 20))
-    tk.Button(prazo_f, text="−", font=("Arial", 12, "bold"),
+    btn_menos = tk.Button(prazo_f, text="−", font=("Arial", 12, "bold"),
               bg=BORDER, fg=TXT, relief="flat", bd=0,
+              activebackground=HOVER, activeforeground=TXT,
               width=4, cursor="hand2",
-              command=lambda: on_mudar_anos(-1)).pack(side="left")
+              command=lambda: on_mudar_anos(-1))
+    btn_menos.pack(side="left")
+    _adicionar_hover(btn_menos)
     tk.Label(prazo_f, textvariable=anos_var, font=("Arial", 14, "bold"),
              bg=PANEL, fg=TXT, width=3, anchor="center").pack(side="left")
     tk.Label(prazo_f, text="anos", font=("Arial", 9),
              bg=PANEL, fg=TXT_SEC).pack(side="left", padx=(2, 0))
-    tk.Button(prazo_f, text="+", font=("Arial", 12, "bold"),
+    btn_mais = tk.Button(prazo_f, text="+", font=("Arial", 12, "bold"),
               bg=BORDER, fg=TXT, relief="flat", bd=0,
+              activebackground=HOVER, activeforeground=TXT,
               width=4, cursor="hand2",
-              command=lambda: on_mudar_anos(+1)).pack(side="left")
+              command=lambda: on_mudar_anos(+1))
+    btn_mais.pack(side="left")
+    _adicionar_hover(btn_mais)
 
     ttk.Button(inner, text="Adicionar →", style="Add.TButton",
                cursor="hand2", command=on_adicionar).grid(row=1, column=3, sticky="w")
