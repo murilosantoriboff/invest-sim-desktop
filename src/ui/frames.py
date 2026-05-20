@@ -10,6 +10,7 @@ from core.constants import (
     CV_W, CV_H, CX, CY, R_EXT, R_INT, CARD_COLS, formatar_brl,
 )
 from core.calculator import calcular_totais
+from ui.tooltip import Tooltip, abrir_glossario
 
 
 def configurar_estilos():
@@ -41,9 +42,19 @@ def criar_header(root, data_atualizacao=None):
     f = tk.Frame(root, bg=BG)
     f.pack(fill="x", pady=(18, 8), padx=30)
 
+    direita = tk.Frame(f, bg=BG)
+    direita.pack(side="right", anchor="ne")
+
+    ajuda = tk.Label(
+        direita, text="?", font=("Arial", 11, "bold"),
+        bg=BORDER, fg=TXT, padx=8, pady=1, cursor="hand2",
+    )
+    ajuda.pack(side="right", padx=(8, 0))
+    ajuda.bind("<Button-1>", lambda _e: abrir_glossario(root))
+
     if data_atualizacao:
-        tk.Label(f, text=f"Taxas atualizadas em {data_atualizacao}",
-                 font=("Arial", 8), bg=BG, fg=TXT_SEC).pack(side="right", anchor="ne")
+        tk.Label(direita, text=f"Taxas atualizadas em {data_atualizacao}",
+                 font=("Arial", 8), bg=BG, fg=TXT_SEC).pack(side="right")
 
     esquerda = tk.Frame(f, bg=BG)
     esquerda.pack(side="left", anchor="w")
@@ -90,6 +101,7 @@ def criar_input_panel(root, tipo_var, anos_var, on_adicionar, on_mudar_anos):
                        command=lambda c=cod: selecionar(c))
         b.pack(side="left", padx=(0, 4))
         pill_btns[cod] = b
+        Tooltip(b, config.get("descricao", ""))
     selecionar(primeiro)
 
     tk.Label(inner, text="Valor (R$)", font=("Arial", 10, "bold"),
@@ -245,6 +257,10 @@ def atualizar_legenda(legenda, dados_grafico):
         card = tk.Frame(legenda, bg="#F0EEEB", padx=12, pady=10)
         card.grid(row=row, column=col, padx=(0, 8), pady=(0, 8), sticky="nw")
 
+        descricao = INVESTIMENTOS.get(d.get("cod_investimento", ""), {}).get("descricao", "")
+        if descricao:
+            Tooltip(card, descricao)
+
         # cabeçalho do card
         header = tk.Frame(card, bg="#F0EEEB")
         header.pack(anchor="w")
@@ -294,8 +310,6 @@ def atualizar_chips(chip_outer, itens_carteira, on_remover):
     chip_outer.delete("1.0", "end")
 
     if not itens_carteira:
-        chip_outer.tag_config("placeholder", foreground=TXT)
-        chip_outer.insert("end", "Nenhum investimento adicionado.", "placeholder")
         chip_outer.config(state="disabled")
         return
 
