@@ -9,6 +9,7 @@ BORDER   = "#E8E5DE"
 TXT      = "#18181B"
 TXT_SEC  = "#71717A"
 GREEN    = "#16A34A"
+RED      = "#DC2626"
 BLUE     = "#3B6FE0"
 BLUE_D   = "#2952B8"
 
@@ -49,7 +50,6 @@ R_EXT = 150
 R_INT = 85
 
 # Legenda grid
-CARD_W    = 200
 CARD_COLS = 4
 
 # Prazo

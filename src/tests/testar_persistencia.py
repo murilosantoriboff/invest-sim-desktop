@@ -12,9 +12,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from infrastructure.storage import json_repository as repo
 from infrastructure.storage.json_repository import (
-    salvar_carteira, carregar_carteira, limpar_carteira,
+    salvar_carteira, carregar_carteira,
     salvar_cache_taxas, carregar_cache_taxas,
-    cache_taxas_existe, data_cache_taxas,
+    data_cache_taxas,
 )
 
 passed = 0
@@ -75,12 +75,12 @@ def main():
             f.write("{json invalido!!!")
         teste("Arquivo corrompido retorna lista vazia", carregar_carteira() == [])
 
-        limpar_carteira()
-        teste("Após limpar, vazia", carregar_carteira() == [])
+        os.remove(repo.CARTEIRA_PATH)
+        teste("Após remover arquivo, vazia", carregar_carteira() == [])
 
         print("\n--- Cache de taxas ---\n")
 
-        teste("Cache não existe", not cache_taxas_existe())
+        teste("Cache não existe", not os.path.exists(repo.CACHE_TAXAS_PATH))
         teste("Data é None", data_cache_taxas() is None)
         teste("Carregar retorna lista vazia", carregar_cache_taxas() == [])
 
@@ -93,7 +93,7 @@ def main():
         ]
 
         salvar_cache_taxas(taxas_exemplo)
-        teste("Cache criado", cache_taxas_existe())
+        teste("Cache criado", os.path.exists(repo.CACHE_TAXAS_PATH))
         teste("Data não é None", data_cache_taxas() is not None)
 
         cache = carregar_cache_taxas()

@@ -47,11 +47,6 @@ def carregar_carteira():
         return []
 
 
-def limpar_carteira():
-    if os.path.exists(CARTEIRA_PATH):
-        os.remove(CARTEIRA_PATH)
-
-
 # ── Cache de taxas ────────────────────────────────────────────────────────────
 
 def salvar_cache_taxas(indicadores):
@@ -73,10 +68,6 @@ def carregar_cache_taxas():
         return dados.get("indicadores", [])
     except (json.JSONDecodeError, KeyError, TypeError):
         return []
-
-
-def cache_taxas_existe():
-    return os.path.exists(CACHE_TAXAS_PATH)
 
 
 def data_cache_taxas():

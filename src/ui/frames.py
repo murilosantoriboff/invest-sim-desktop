@@ -6,8 +6,8 @@ import tkinter as tk
 from tkinter import ttk
 
 from core.constants import (
-    INVESTIMENTOS, BG, PANEL, BORDER, TXT, TXT_SEC, BLUE, BLUE_D, GREEN,
-    CV_W, CV_H, CX, CY, R_EXT, R_INT, CARD_W, CARD_COLS, formatar_brl,
+    INVESTIMENTOS, BG, PANEL, BORDER, TXT, TXT_SEC, BLUE, BLUE_D, GREEN, RED,
+    CV_W, CV_H, CX, CY, R_EXT, R_INT, CARD_COLS, formatar_brl,
 )
 from core.calculator import calcular_totais
 
@@ -28,12 +28,6 @@ def configurar_estilos():
                 background=BLUE, foreground="white")
     s.map("Add.TButton",
           background=[("active", BLUE_D)])
-
-    s.configure("Step.TButton", font=("Arial", 12, "bold"),
-                relief="flat", borderwidth=0, padding=(4, 2),
-                background=BORDER, foreground=TXT)
-    s.map("Step.TButton",
-          background=[("active", "#D4D4D4")])
 
     for cod, config in INVESTIMENTOS.items():
         s.configure(f"Pill_{cod}.TButton", font=("Arial", 9, "bold"),
@@ -226,9 +220,13 @@ def desenhar_grafico(canvas, dados_grafico, anos):
                        font=("Arial", 16, "bold"), fill=TXT)
     canvas.create_text(CX, CY + 2,
                        text="investido", font=("Arial", 9), fill=TXT_SEC)
+
+    ganho_total = totais['total_ganho']
+    sinal = "+" if ganho_total >= 0 else "−"
+    cor_ganho = GREEN if ganho_total >= 0 else RED
     canvas.create_text(CX, CY + 24,
-                       text=f"+ {formatar_brl(totais['total_ganho'])}",
-                       font=("Arial", 12, "bold"), fill=GREEN)
+                       text=f"{sinal} {formatar_brl(abs(ganho_total))}",
+                       font=("Arial", 12, "bold"), fill=cor_ganho)
     canvas.create_text(CX, CY + 44,
                        text=f"em {anos} anos", font=("Arial", 9), fill=TXT_SEC)
 
@@ -260,8 +258,15 @@ def atualizar_legenda(legenda, dados_grafico):
                  font=("Arial", 9), bg="#F0EEEB", fg=TXT_SEC).pack(anchor="w", pady=(6, 0))
         tk.Label(card, text=f"Projeção: {formatar_brl(d['valor_futuro'])}",
                  font=("Arial", 9), bg="#F0EEEB", fg=TXT).pack(anchor="w")
-        tk.Label(card, text=f"Ganho: + {formatar_brl(d['ganho'])} ({d['percentual_ganho']:.1f}%)",
-                 font=("Arial", 9), bg="#F0EEEB", fg=GREEN).pack(anchor="w")
+
+        sinal = "+" if d['ganho'] >= 0 else "−"
+        cor_ganho = GREEN if d['ganho'] >= 0 else RED
+        tk.Label(
+            card,
+            text=f"Ganho: {sinal} {formatar_brl(abs(d['ganho']))} ({abs(d['percentual_ganho']):.1f}%)",
+            font=("Arial", 9), bg="#F0EEEB", fg=cor_ganho,
+        ).pack(anchor="w")
+
         tk.Label(card, text=f"Taxa: {d['taxa_exibicao']:.2f}% a.a.",
                  font=("Arial", 9), bg="#F0EEEB", fg=TXT_SEC).pack(anchor="w")
 

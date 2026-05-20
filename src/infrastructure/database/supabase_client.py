@@ -16,14 +16,3 @@ def buscar_indicadores():
     cliente = _get_client()
     resposta = cliente.table("vw_indicadores_investimento").select("*").execute()
     return resposta.data
-
-
-def buscar_indicadores_por_ano(ano):
-    cliente = _get_client()
-    resposta = (
-        cliente.table("vw_indicadores_investimento")
-        .select("*")
-        .eq("ano_referencia", ano)
-        .execute()
-    )
-    return resposta.data
