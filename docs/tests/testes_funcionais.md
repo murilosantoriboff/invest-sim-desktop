@@ -34,6 +34,18 @@ Estes testes validam isoladamente as funções matemáticas e de mapeamento cont
   * **Objetivo:** Validar se a função `_organizar_taxas` agrupa corretamente a lista de dicionários em um mapa indexado pelo código do investimento e ano.
 * **Cenário 8: Filtro de Ativos Desconhecidos**
   * **Objetivo:** Garantir que ativos na carteira que não possuam correspondência de taxas ou indexadores válidos sejam ignorados no gráfico para evitar quebras visuais.
+* **Cenário 9: Taxa Anualizada Equivalente**
+  * **Objetivo:** Validar que a `taxa_exibicao` mostrada no card de cada investimento é a média geométrica das taxas projetadas (a taxa fixa equivalente que produziria o mesmo valor futuro), e não simplesmente a taxa do primeiro ano.
+  * **Validação:** Para uma curva Selic decrescente (13,25% → 11,50% → 10,50%) em 3 anos, o sistema deve exibir uma taxa equivalente próxima de 11,75% a.a.
+
+### 1.4 Projeção Cambial (Dólar)
+* **Cenário 10: Valorização por Cotação**
+  * **Objetivo:** Diferentemente dos investimentos de renda fixa (que usam juros compostos), o CAMBIO é projetado pela razão entre a cotação esperada do ano final e a cotação do ano inicial. A `vlr_mediana` do BCB para Câmbio é a cotação R$/USD esperada, não uma taxa percentual.
+  * **Validação:** Para R$ 10.000 com cotação inicial 5,10 e cotação final 5,17 em 1 ano, o sistema deve retornar aproximadamente R$ 10.137,25 (10.000 × 5,17/5,10).
+* **Cenário 11: Fallback para Último Ano Disponível**
+  * **Objetivo:** Quando o prazo solicitado ultrapassa o último ano de cotações disponível na base, o sistema deve usar a última cotação conhecida como referência.
+* **Cenário 12: Proteção contra Cotação Inicial Inválida**
+  * **Objetivo:** Se a cotação inicial for zero ou inexistente, o sistema deve retornar o valor original investido em vez de quebrar com divisão por zero.
 
 ---
 
@@ -54,7 +66,7 @@ Valida o comportamento do componente `json_repository.py` na leitura, escrita e 
 
 ### 2.2 Cache de Taxas Local (`cache_taxas.json`)
 * **Cenário 5: Verificando se o Cache Existe**
-  * **Objetivo:** Garante que o sistema sabe quando não tem nada salvo no cache local (`cache_taxas_existe() == False`).
+  * **Objetivo:** Garante que o sistema sabe quando não tem nada salvo no cache local (`data_cache_taxas()` retorna `None` e `carregar_cache_taxas()` retorna lista vazia).
 * **Cenário 6: Alimentando o Cache**
   * **Validação:** Salva uma lista de taxas de teste no arquivo e checa se o sistema passa a reconhecer que o cache existe e mostra a data/hora em que foi atualizado.
 

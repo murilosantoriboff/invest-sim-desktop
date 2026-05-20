@@ -88,7 +88,6 @@ Salva os investimentos que o usuário adicionou no simulador. Exemplo do arquivo
 Funções disponíveis em `json_repository.py`:
 - `salvar_carteira(itens)` — recebe lista de dicts e grava no JSON
 - `carregar_carteira()` → retorna lista de dicts (vazia se não existir)
-- `limpar_carteira()` — remove o arquivo
 
 ### Cache de taxas (`data/cache_taxas.json`)
 
@@ -112,7 +111,6 @@ Cópia local das taxas do Supabase para uso offline. Quando o app inicia, tenta 
 Funções disponíveis:
 - `salvar_cache_taxas(indicadores)` — grava a lista retornada pelo Supabase
 - `carregar_cache_taxas()` → retorna lista no mesmo formato da view
-- `cache_taxas_existe()` → boolean
 - `data_cache_taxas()` → string ISO da última atualização ou None
 
 ---
@@ -135,8 +133,8 @@ O script `testar_persistencia.py` em `src/tests/` testa todas as funções de fo
 - Salvar, carregar, atualizar e remover itens da carteira
 - Resiliência a JSON corrompido (retorna lista vazia em vez de crashar)
 - Salvar e carregar cache de taxas
-- Verificação de existência e data do cache
+- Verificação de data da última atualização do cache
 
 ---
 
-*Última atualização: Semana 3 — 21/04/2026*
+*Última atualização: Semana 7 — 19/05/2026*
