@@ -78,7 +78,7 @@ Estes testes juntam todas as peças do quebra-cabeça. Eles fazem o fluxo comple
 ### 3.2 Fluxo Offline (Usando apenas o Cache Local)
 * **Cenário 4: Simulação Completa sem Internet**
   * **Objetivo:** Alimenta o sistema com taxas simuladas de 2025 a 2027 para vários investimentos (SELIC, CDI, IPCA, POUPANÇA) com o computador offline.
-  * **alidação:** 
+  * **validação:** 
     * Validar se o total somado investido bate precisamente com a entrada (R$ 18.000,00).
     * Testar o incremento dinâmico de prazos de projeção (passar de 5 para 10 anos) e auditar se a regra de negócio calcula corretamente o ganho exponencial proporcional ao aumento do tempo.
 
@@ -90,7 +90,7 @@ Para entender rápido o foco de cada arquivo de teste:
 
 | Arquivo de Teste | O que ele foca | Estilo do Teste | O que ele garante |
 | :--- | :--- | :--- | :--- |
-| `testar_calculator.py` | Lógica das contas e funções financeiras | Direto na função (Unitário) | Contas de juros perfeitas, proteção contra valores zerados e formatação de cores para o gráfico. |
+| `testar_calculator.py` | Lógica das contas e funções financeiras | Direto na função (Unitário) | Calculos de juros, proteção contra valores zerados e formatação de cores para o gráfico. |
 | `testar_persistencia.py` | Criação, leitura e exclusão de arquivos | Mexendo em arquivos (I/O) | Gravação correta no HD, pastas criadas no lugar certo e segurança contra arquivos corrompidos. |
 | `testar_integracao.py` | O caminho do dado do início ao fim | Fluxo completo (Integração) | Conexão com o banco na nuvem, atualização automática de cache e coerência dos lucros a longo prazo. |
 
