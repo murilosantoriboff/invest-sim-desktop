@@ -9,6 +9,7 @@ Rodar de dentro da pasta src/:
 import sys
 import os
 import tkinter as tk
+from tkinter import filedialog, messagebox
 import traceback
 from datetime import datetime
 
@@ -79,7 +80,10 @@ class App(tk.Tk):
             return None
 
     def _montar_ui(self):
-        criar_header(self, self._formatar_data_atualizacao())
+        criar_header(
+            self, self._formatar_data_atualizacao(),
+            on_exportar_pdf=self._exportar_pdf,
+        )
         self._refs = criar_input_panel(
             self, self._tipo_var, self._anos_var,
             on_adicionar=self._adicionar,
@@ -135,6 +139,25 @@ class App(tk.Tk):
         self._anos_var.set(novo)
         self._recalcular()
         self._redesenhar()
+
+    def _exportar_pdf(self):
+        from infrastructure.pdf_export import exportar_pdf
+        nome_padrao = f"simulacao_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
+        caminho = filedialog.asksaveasfilename(
+            parent=self, title="Salvar simulação como PDF",
+            defaultextension=".pdf", initialfile=nome_padrao,
+            filetypes=[("PDF", "*.pdf")],
+        )
+        if not caminho:
+            return
+        try:
+            exportar_pdf(
+                self._dados_grafico, self._anos_var.get(),
+                self._formatar_data_atualizacao(), caminho,
+            )
+            messagebox.showinfo("PDF gerado", f"Arquivo salvo em:\n{caminho}", parent=self)
+        except Exception as e:
+            messagebox.showerror("Erro ao gerar PDF", str(e), parent=self)
 
 
 if __name__ == "__main__":

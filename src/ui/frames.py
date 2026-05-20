@@ -38,7 +38,7 @@ def configurar_estilos():
               background=[("active", config["cor"])])
 
 
-def criar_header(root, data_atualizacao=None):
+def criar_header(root, data_atualizacao=None, on_exportar_pdf=None):
     f = tk.Frame(root, bg=BG)
     f.pack(fill="x", pady=(18, 8), padx=30)
 
@@ -51,6 +51,15 @@ def criar_header(root, data_atualizacao=None):
     )
     ajuda.pack(side="right", padx=(8, 0))
     ajuda.bind("<Button-1>", lambda _e: abrir_glossario(root))
+
+    if on_exportar_pdf is not None:
+        btn_pdf = tk.Label(
+            direita, text="Exportar PDF", font=("Arial", 9, "bold"),
+            bg=BLUE, fg="white", padx=10, pady=3, cursor="hand2",
+        )
+        btn_pdf.pack(side="right", padx=(8, 0))
+        btn_pdf.bind("<Button-1>", lambda _e: on_exportar_pdf())
+        Tooltip(btn_pdf, "Exportar a simulação atual como PDF")
 
     if data_atualizacao:
         tk.Label(direita, text=f"Taxas atualizadas em {data_atualizacao}",

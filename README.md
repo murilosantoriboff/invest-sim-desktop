@@ -19,6 +19,9 @@ As taxas são atualizadas automaticamente a partir da API do Banco Central do Br
 - Escolher o prazo de 1 a 30 anos
 - Gráfico de rosca mostrando a proporção de cada investimento
 - Legenda com detalhamento de cada aplicação (valor futuro, ganho, taxa)
+- Tooltips explicativos ao passar o mouse sobre cada tipo de investimento
+- Glossário completo dos investimentos disponíveis (botão "?" no canto superior direito)
+- Exportação da simulação atual em PDF
 - Taxas reais do BCB via Supabase (com cache offline)
 - Carteira salva localmente em JSON
 
@@ -47,12 +50,14 @@ invest-sim-desktop/
 │   │   ├── calculator.py               # cálculos financeiros
 │   │   └── constants.py                # configurações e constantes
 │   ├── ui/
-│   │   └── frames.py                   # interface Tkinter
+│   │   ├── frames.py                   # interface Tkinter
+│   │   └── tooltip.py                  # tooltips em hover + janela do glossário
 │   ├── infrastructure/
 │   │   ├── database/
 │   │   │   └── supabase_client.py      # acesso ao Supabase
-│   │   └── storage/
-│   │       └── json_repository.py      # persistência local
+│   │   ├── storage/
+│   │   │   └── json_repository.py      # persistência local
+│   │   └── pdf_export.py               # exportação da simulação em PDF
 │   └── tests/
 │       ├── testar_persistencia.py
 │       ├── testar_calculator.py

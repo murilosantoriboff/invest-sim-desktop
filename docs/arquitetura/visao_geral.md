@@ -15,6 +15,7 @@ Os dados de mercado (taxas Selic, CDI, IPCA) vêm do Supabase, que é alimentado
 Responsável por tudo que o usuário vê e interage.
 
 - `frames.py` — monta as telas do Tkinter (header, painel de input, gráfico de rosca, legenda, chips da carteira), configura os estilos visuais e gerencia os eventos
+- `tooltip.py` — componente reutilizável de tooltip em hover (aparece após ~500ms ao passar o mouse) e a janela do glossário de investimentos (acessada pelo botão "?" no header)
 
 Essa camada não faz cálculo nenhum e não acessa banco de dados. Ela só chama a camada de negócio e exibe o resultado.
 
@@ -33,6 +34,7 @@ Cuida de ler e gravar dados, seja na nuvem ou localmente.
 
 - `database/supabase_client.py` — conecta ao Supabase e consulta a view `vw_indicadores_investimento`
 - `storage/json_repository.py` — salva e carrega a carteira do usuário e o cache de taxas em arquivos JSON locais
+- `pdf_export.py` — gera um PDF da simulação atual (título, tabela com cada investimento e totais) usando a biblioteca `fpdf2`
 
 ---
 
@@ -75,14 +77,23 @@ main.py (orquestrador)
   ├── chama → frames.py (interface)
   ├── chama → calculator.py (projeções)
   ├── chama → supabase_client.py (taxas na inicialização)
-  └── chama → json_repository.py (salvar/carregar carteira e cache)
+  ├── chama → json_repository.py (salvar/carregar carteira e cache)
+  └── chama → pdf_export.py (ao clicar em "Exportar PDF")
 
 calculator.py
   └── depende de → constants.py (mapeamento de investimentos)
 
 frames.py
-  └── depende de → constants.py (cores, dimensões)
+  └── depende de → constants.py (cores, dimensões, descrições)
   └── depende de → calculator.py (calcular_totais para o gráfico)
+  └── depende de → tooltip.py (tooltips em hover e janela do glossário)
+
+tooltip.py
+  └── depende de → constants.py (cores e dicionário INVESTIMENTOS)
+
+pdf_export.py
+  └── depende de → calculator.py (calcular_totais para o resumo do PDF)
+  └── depende de → constants.py (formatar_brl)
 ```
 
 ---
@@ -95,4 +106,4 @@ Link: https://www.figma.com/board/nN0JSuSVPB9LzBQh5qHSJh/Hist%C3%B3rias-de-Usu%C
 
 ---
 
-*Última atualização: Semana 5 — 05/05/2026*
+*Última atualização: Semana 7 — 20/05/2026*
