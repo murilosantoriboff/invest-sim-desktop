@@ -1,4 +1,4 @@
-# O que nossos testes fazem (Especificação de Testes)
+# Especificação de Testes Funcionais e de Integração
 
 Este documento foi feito para explicar, de forma simples e direta, o que cada um dos nossos scripts de teste valida automaticamente. Cobrimos desde a matemática dos cálculos de investimento até como o sistema se comporta salvando arquivos locais ou buscando dados na nuvem.
 
@@ -6,82 +6,81 @@ Este documento foi feito para explicar, de forma simples e direta, o que cada um
 
 ## 1. Testes do Motor de Cálculo (`testar_calculator.py`)
 
-Aqui nós testamos as funções matemáticas e as regras de negócio do arquivo `core/calculator.py`. O objetivo é garantir que as contas de projeção financeira estão certas e não vão quebrar na frente do usuário.
+Estes testes validam isoladamente as funções matemáticas e de mapeamento contidas no motor de cálculo (`core/calculator`), garantindo que as projeções financeiras sigam as regras de negocio.
 
-### 1.1 Projeções de Valor Futuro
-* **Cenário 1: Juros Compostos com Taxa Fixa**
-  * **O que testa:** Se um dinheiro investido com uma taxa fixa e bonita rende o esperado ao longo de 5 anos usando juros compostos.
-  * **O que valida:** Se você colocar R$ 10.000,00 a uma taxa firme de 14,75% ao ano, o resultado no final precisa ser de aproximadamente R$ 19.895,89.
-* **Cenário 2: E se a Taxa for Zero?**
-  * **O que testa:** Se o motor de cálculo é estável caso o investimento não renda nada.
-  * **O que valida:** O valor futuro não pode mudar (R$ 1.000,00 com 0% de taxa por 1 ano tem que continuar sendo exatamente R$ 1.000,00).
-* **Cenário 3: Taxas que Mudam todo Ano (Variáveis)**
-  * **O que testa:** Como o sistema lida com o mundo real, onde a taxa de juros muda ano após ano.
-  * **O que valida:** O rendimento passo a passo de um aporte de R$ 10.000,00 mudando as taxas a cada ano (Ano 1: 14,75%, Ano 2: 12,50%, Ano 3: 10,00%).
-* **Cenário 4: Falta de Taxas no Futuro (*Flat fallback*)**
-  * **O que testa:** O que acontece quando o usuário pede uma simulação longa (ex: 5 anos), mas só temos taxas cadastradas para os primeiros 3 anos.
-  * **O que valida:** O sistema aplica as taxas que conhece nos primeiros anos e repete a última taxa disponível para o resto do tempo, sem travar a conta.
+### 1.1 Projeção de Valor Futuro
+* **Cenário 1: Juros Compostos Fixos**
+  * **Objetivo:** Garantir que um aporte inicial sob uma taxa fixa e constante ao longo de 5 anos capitalize corretamente via juros compostos.
+  * **Validação:** Um valor de R$ 10.000,00 a uma taxa estável de 14,75% ao ano deve render aproximadamente R$ 19.895,89.
+* **Cenário 2: Taxa Zero**
+  * **Objetivo:** Verificar a estabilidade do motor de cálculo se a taxa de juros for nula.
+  * **Validação:** O valor futuro deve ser exatamente igual ao valor investido original (R$ 1.000,00 com taxa de 0% por 1 ano resulta em R$ 1.000,00).
+* **Cenário 3: Taxas Variáveis**
+  * **Objetivo:** Como o sistema lida com o mundo real, onde a taxa de juros muda ano após ano.
+  * **Validação:** Avaliar progressivamente o rendimento de um aporte de R$ 10.000,00 sob a curva de juros variável (Ano 1: 14,75%, Ano 2: 12,50%, Ano 3: 10,00%).
+* **Cenário 4: EFalta de Taxas no Futuro**
+  * **Objetivo:** Testar o comportamento do sistema quando o período solicitado de projeção (ex: 5 anos) é maior que a quantidade de anos com taxas cadastradas na base (ex: 3 anos).
+  * **Validação:** O sistema deve aplicar as taxas conhecidas para os primeiros anos e replicar a última taxa disponível (*flat*) para os anos restantes.
 
-### 1.2 Métricas e Contas Auxiliares
-* **Cenário 5: Conta de Ganho Real (Em Reais)**
-  * **O que testa:** Se o lucro em dinheiro é calculado certinho (Valor Futuro menos o Valor Investido).
-* **Cenário 6: Conta de Ganho em Percentual**
-  * **O que testa:** Se a porcentagem de lucro sobre o valor inicial está correta.
-  * **O que valida:** Um teste de segurança para garantir que se o valor investido for R$ 0,00, o sistema não tente dividir por zero e quebre (deve retornar 0,0% de ganho).
+### 1.2 Funções Auxiliares e Métricas
+* **Cenário 5: Cálculo de Ganho**
+  * **Objetivo:** Garantir que o rendimento absoluto seja a diferença simples entre o valor futuro e o valor investido.
+* **Cenário 6: Cálculo de Ganho em Percentual**
+  * **Objetivo:** Validar o cálculo do retorno percentual sobre o capital inicial.
+  * **Validação:** Proteção contra divisão por zero se o valor investido for igual a R$ 0,00 (deve retornar 0,0% de ganho).
 
-### 1.3 Preparando Dados para o Gráfico
-* **Cenário 7: Organização das Taxas**
-  * **O que testa:** Se a função `_organizar_taxas` consegue pegar aquela lista bagunçada que vem do banco e arrumar tudo num mapa organizado por tipo de investimento e ano.
-* **Cenário 8: Ignorar Investimentos Desconhecidos**
-  * **O que testa:** Se o usuário tiver um ativo estranho na carteira (que não tem taxa cadastrada), o sistema não pode bugar.
-  * **O que valida:** O ativo desconhecido é deixado de lado na hora de montar o gráfico para evitar que a tela quebre ou exiba dados errados.
+### 1.3 Preparação de Dados para Interface Visual
+* **Cenário 7: Estruturação dos Indicadores**
+  * **Objetivo:** Validar se a função `_organizar_taxas` agrupa corretamente a lista de dicionários em um mapa indexado pelo código do investimento e ano.
+* **Cenário 8: Filtro de Ativos Desconhecidos**
+  * **Objetivo:** Garantir que ativos na carteira que não possuam correspondência de taxas ou indexadores válidos sejam ignorados no gráfico para evitar quebras visuais.
 
 ---
 
-## 2. Testes de Armazenamento Local (`testar_persistencia.py`)
+## 2. Testes de Persistência Local (`testar_persistencia.py`)
 
-Aqui nós testamos o `json_repository.py`. Queremos ter certeza de que o sistema consegue ler e salvar arquivos locais sem perder dados e que sabe se virar se algo der errado.
+Valida o comportamento do componente `json_repository.py` na leitura, escrita e resiliência de falhas dos arquivos locais de configuração e dados da carteira.
 
 ### 2.1 Salvando e Carregando a Carteira (`carteira.json`)
 * **Cenário 1: Começando do Zero**
-  * **O que testa:** Se o arquivo ainda não existir (ou se a carteira for limpa), o sistema precisa devolver uma lista vazia `[]` em vez de estourar um erro na tela.
-* **Cenário 2: Salvar e Ler sem Perder Nada**
-  * **O que testa:** Criamos uma carteira com 3 investimentos (SELIC, CDI e POUPANÇA), salvamos no arquivo e depois lemos de volta para ver se os valores e nomes continuam iguaizinhos.
+  * **Objetivo:** Se o arquivo ainda não existir (ou se a carteira for limpa), o sistema precisa devolver uma lista vazia `[]`;
+* **Cenário 2: Leitura e Escrita sem Perda**
+  * **Objetivo:** Salvar uma carteira com 3 ativos (SELIC, CDI, POUPANÇA), confirmar a criação física do arquivo e validar se a ordem e os tipos de dados (float/string) foram preservados no carregamento.
 * **Cenário 3: Colocar e Tirar Itens da Carteira**
-  * **O que testa:** Simula o usuário mexendo na carteira — adicionando um novo ativo (IPCA) e depois removendo outro (CDI) — checando se o arquivo atualiza certinho a cada passo.
-* **Cenário 4: O que fazer se o Arquivo Corromper?**
-  * **O que testa:** Um teste de fogo. Injetamos um texto quebrado e inválido (`{json invalido!!!`) direto no arquivo para fingir que ele corrompeu.
-  * **O que valida:** O sistema precisa perceber o erro, ignorar o arquivo quebrado e devolver uma lista vazia por segurança, sem travar o aplicativo.
+  * **Objetivo:** Simula o usuário mexendo na carteira — adicionando um novo ativo (IPCA) e depois removendo outro (CDI) — garantindo a consistência do arquivo;
+* **Cenário 4: Resiliência a Arquivos Corrompidos**
+  * **Objetivo:** Simular uma falha grave de infraestrutura injetando uma string JSON inválida (`{json invalido!!!`) diretamente no arquivo.
+  * **Validação:** O sistema precisa perceber o erro, ignorar o arquivo quebrado e devolver uma lista vazia por segurança, sem travar o aplicativo.
 
 ### 2.2 Cache de Taxas Local (`cache_taxas.json`)
 * **Cenário 5: Verificando se o Cache Existe**
-  * **O que testa:** Garante que o sistema sabe quando não tem nada salvo no cache local (`cache_taxas_existe() == False`).
+  * **Objetivo:** Garante que o sistema sabe quando não tem nada salvo no cache local (`cache_taxas_existe() == False`).
 * **Cenário 6: Alimentando o Cache**
-  * **O que testa:** Salva uma lista de taxas de teste no arquivo e checa se o sistema passa a reconhecer que o cache existe e mostra a data/hora em que foi atualizado.
+  * **Validação:** Salva uma lista de taxas de teste no arquivo e checa se o sistema passa a reconhecer que o cache existe e mostra a data/hora em que foi atualizado.
 
 ---
 
 ## 3. Testes de Integração de Ponta a Ponta (`testar_integracao.py`)
 
-Estes testes juntam todas as peças do quebra-cabeça. Eles fazem o fluxo completo: buscam os dados (na internet ou no cache), salvam no arquivo local, mandam pro motor de cálculo e geram os resultados finais.
+Estes testes juntam todas as peças do quebra-cabeça. Eles fazem o fluxo completo: buscam os dados (do supabase ou no cache), salvam no arquivo local, mandam pro motor de cálculo e geram os resultados finais.
 
 [Supabase / Cache] ──> [JSON Repository] ──> [Core Calculator] ──> [Resultados Finais]
 
 
 ### 3.1 Fluxo Online (Conectado com o Supabase)
 * **Cenário 1: Conversando com o Banco de Dados**
-  * **O que testa:** Vê se o nosso código consegue se conectar de verdade com o Supabase na internet e trazer a lista de taxas atualizadas.
-* **Cenário 2: Atualização Silenciosa do Cache**
-  * **O que testa:** Garante que assim que os dados novos chegam da internet, eles são salvos na hora no arquivo de cache local.
-* **Cenário 3: Olhar Clínico sobre o Rendimento**
-  * **O que testa:** Passa esses dados reais por uma simulação de 5 anos para ver se a lógica de mercado faz sentido (em renda fixa, o valor final precisa ser maior que o dinheiro que você colocou no início).
+  * **Objetivo:** Testar se a biblioteca cliente consegue se conectar com o cluster do Supabase, efetuar a autenticação/busca e retornar registros válidos das taxas.
+* **Cenário 2: Atualização Automática de Cache**
+  * **Objetivo:** Garantir que os dados novos trazidos da API online sejam imediatamente salvos e reflitam de forma idêntica no cache offline local.
+* **Cenário 3: Validação Logística do Rendimento**
+  * **Objetivo:** Passa esses dados reais por uma simulação de 5 anos para ver se a lógica de mercado faz sentido (em renda fixa, o valor final precisa ser maior que o dinheiro que você colocou no início).
 
 ### 3.2 Fluxo Offline (Usando apenas o Cache Local)
 * **Cenário 4: Simulação Completa sem Internet**
-  * **O que testa:** Alimenta o sistema com taxas simuladas de 2025 a 2027 para vários investimentos (SELIC, CDI, IPCA, POUPANÇA) com o computador offline.
-  * **O que valida:** 
-    * Checa se a soma total investida bate certinho com o que foi digitado (R$ 18.000,00).
-    * Testa se, ao aumentar o tempo da simulação de 5 para 10 anos, o motor de cálculo aumenta o lucro de forma exponencial por causa dos juros compostos.
+  * **Objetivo:** Alimenta o sistema com taxas simuladas de 2025 a 2027 para vários investimentos (SELIC, CDI, IPCA, POUPANÇA) com o computador offline.
+  * **alidação:** 
+    * Validar se o total somado investido bate precisamente com a entrada (R$ 18.000,00).
+    * Testar o incremento dinâmico de prazos de projeção (passar de 5 para 10 anos) e auditar se a regra de negócio calcula corretamente o ganho exponencial proporcional ao aumento do tempo.
 
 ---
 
@@ -97,9 +96,9 @@ Para entender rápido o foco de cada arquivo de teste:
 
 ---
 
-## 5. Como rodar os testes?
+## 5. Instrucoes para
 
-Para rodar essa suíte de testes e ver se está tudo funcionando perfeitamente, abra o terminal na raiz da pasta `src/` e execute:
+Para rodar a suíte completa de validações funcionais, execute os comandos a partir da raiz da pasta `src/`:
 
 ```bash
 # Para testar a matemática e regras do motor de cálculo
