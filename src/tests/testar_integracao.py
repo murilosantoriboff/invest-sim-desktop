@@ -6,13 +6,14 @@ Rodar a partir de src/: python tests/testar_integracao.py
 
 import sys
 import os
+import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from infrastructure.storage import json_repository as repo
 from infrastructure.storage.json_repository import (
     salvar_carteira, carregar_carteira, limpar_carteira,
     salvar_cache_taxas, carregar_cache_taxas,
-    CARTEIRA_PATH, CACHE_TAXAS_PATH,
 )
 from core.calculator import preparar_dados_grafico, calcular_totais
 
@@ -126,15 +127,6 @@ def fluxo_com_cache():
     teste("Prazo maior = ganho maior", totais3["total_ganho"] > totais["total_ganho"])
 
 
-def limpar():
-    limpar_carteira()
-    if os.path.exists(CACHE_TAXAS_PATH):
-        os.remove(CACHE_TAXAS_PATH)
-    data_dir = os.path.dirname(CARTEIRA_PATH)
-    if os.path.exists(data_dir) and not os.listdir(data_dir):
-        os.rmdir(data_dir)
-
-
 def main():
     global passed, failed
 
@@ -142,9 +134,13 @@ def main():
     print("TESTE DE INTEGRAÇÃO — persistência + regra de negócio")
     print("=" * 60)
 
-    fluxo_com_supabase()
-    fluxo_com_cache()
-    limpar()
+    # Usa um diretório temporário pra não tocar nos dados reais do app
+    with tempfile.TemporaryDirectory() as tmpdir:
+        repo.CARTEIRA_PATH = os.path.join(tmpdir, "carteira.json")
+        repo.CACHE_TAXAS_PATH = os.path.join(tmpdir, "cache_taxas.json")
+
+        fluxo_com_supabase()
+        fluxo_com_cache()
 
     print("\n" + "=" * 60)
     print(f"RESULTADO: {passed} passaram, {failed} falharam")

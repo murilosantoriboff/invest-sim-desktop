@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from core.calculator import (
     projetar_valor,
+    projetar_cotacao,
     calcular_ganho,
     calcular_percentual_ganho,
     preparar_dados_grafico,
@@ -73,6 +74,22 @@ def main():
     teste("5 anos (3 taxas + 2 flat a 10%)",
           aprox(projetar_valor(10000, taxas_var, 2026, 5), 17182.38, 2.0))
 
+    print("\n--- Projeção de cotação (CAMBIO) ---\n")
+
+    cotacoes = {2026: 5.10, 2027: 5.17, 2028: 5.26, 2029: 5.30, 2030: 5.30}
+
+    teste("Dólar 1 ano: 10000 * (5.17/5.10)",
+          aprox(projetar_cotacao(10000, cotacoes, 2026, 1), 10137.25, 1.0))
+
+    teste("Dólar 5 anos usa cotação do último ano disponível",
+          aprox(projetar_cotacao(10000, cotacoes, 2026, 5), 10392.16, 1.0))
+
+    teste("Sem cotações retorna valor original",
+          projetar_cotacao(10000, {}, 2026, 5) == 10000.0)
+
+    teste("Cotação inicial zero retorna valor original",
+          projetar_cotacao(10000, {2026: 0, 2027: 5.0}, 2026, 1) == 10000.0)
+
     print("\n--- Auxiliares ---\n")
 
     teste("Ganho = futuro - investido",
@@ -122,6 +139,21 @@ def main():
     dados_inv = preparar_dados_grafico(
         [{"cod_investimento": "BITCOIN", "valor": 1000.0}], taxas_supabase, anos=1)
     teste("Investimento desconhecido é ignorado", len(dados_inv) == 0)
+
+    # taxa_exibicao deve ser a taxa anualizada equivalente (média geométrica),
+    # não a taxa do primeiro ano do mapa
+    taxas_decrescentes = [
+        {"cod_investimento": "SELIC", "ano_referencia": 2026, "vlr_mediana": 13.25},
+        {"cod_investimento": "SELIC", "ano_referencia": 2027, "vlr_mediana": 11.50},
+        {"cod_investimento": "SELIC", "ano_referencia": 2028, "vlr_mediana": 10.50},
+    ]
+    dados_taxa = preparar_dados_grafico(
+        [{"cod_investimento": "SELIC", "valor": 10000.0}],
+        taxas_decrescentes, anos=3, ano_inicio=2026,
+    )
+    # esperada: ((1.1325 * 1.115 * 1.105) ** (1/3) - 1) * 100 ≈ 11.75%
+    teste("taxa_exibicao é a anualizada equivalente, não a do primeiro ano",
+          aprox(dados_taxa[0]["taxa_exibicao"], 11.75, 0.1))
 
     dados_sem = preparar_dados_grafico(
         [{"cod_investimento": "SELIC", "valor": 10000.0}], [], anos=5)

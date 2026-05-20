@@ -43,19 +43,31 @@ def configurar_estilos():
               background=[("active", config["cor"])])
 
 
-def criar_header(root):
+def criar_header(root, data_atualizacao=None):
     f = tk.Frame(root, bg=BG)
     f.pack(fill="x", pady=(18, 8), padx=30)
-    tk.Label(f, text="Simulador de Investimentos",
+
+    if data_atualizacao:
+        tk.Label(f, text=f"Taxas atualizadas em {data_atualizacao}",
+                 font=("Arial", 8), bg=BG, fg=TXT_SEC).pack(side="right", anchor="ne")
+
+    esquerda = tk.Frame(f, bg=BG)
+    esquerda.pack(side="left", anchor="w")
+    tk.Label(esquerda, text="Simulador de Investimentos",
              font=("Arial", 18, "bold"), bg=BG, fg=TXT).pack(anchor="w")
-    tk.Label(f, text="Adicione investimentos e compare os rendimentos",
+    tk.Label(esquerda, text="Adicione investimentos e compare os rendimentos",
              font=("Arial", 9), bg=BG, fg=TXT_SEC).pack(anchor="w")
 
 
 def _validar_valor(novo_texto):
+    # Aceita dígitos, ponto (separador de milhar) e vírgula (decimal, no máximo 1).
     if novo_texto == "":
         return True
-    return novo_texto.isdigit()
+    if not all(c.isdigit() or c in ".," for c in novo_texto):
+        return False
+    if novo_texto.count(",") > 1:
+        return False
+    return True
 
 
 def criar_input_panel(root, tipo_var, anos_var, on_adicionar, on_mudar_anos):
@@ -101,17 +113,17 @@ def criar_input_panel(root, tipo_var, anos_var, on_adicionar, on_mudar_anos):
     prazo_f = tk.Frame(inner, bg=PANEL)
     prazo_f.grid(row=1, column=2, sticky="w", padx=(0, 20))
     tk.Button(prazo_f, text="−", font=("Arial", 12, "bold"),
-    	bg=BORDER, fg=TXT, relief="flat", bd=0,
-        width=4, cursor="hand2",
-        command=lambda: on_mudar_anos(-1)).pack(side="left")
+              bg=BORDER, fg=TXT, relief="flat", bd=0,
+              width=4, cursor="hand2",
+              command=lambda: on_mudar_anos(-1)).pack(side="left")
     tk.Label(prazo_f, textvariable=anos_var, font=("Arial", 14, "bold"),
              bg=PANEL, fg=TXT, width=3, anchor="center").pack(side="left")
     tk.Label(prazo_f, text="anos", font=("Arial", 9),
              bg=PANEL, fg=TXT_SEC).pack(side="left", padx=(2, 0))
     tk.Button(prazo_f, text="+", font=("Arial", 12, "bold"),
-          	bg=BORDER, fg=TXT, relief="flat", bd=0,
-         	 width=4, cursor="hand2",
-          	command=lambda: on_mudar_anos(+1)).pack(side="left")
+              bg=BORDER, fg=TXT, relief="flat", bd=0,
+              width=4, cursor="hand2",
+              command=lambda: on_mudar_anos(+1)).pack(side="left")
 
     ttk.Button(inner, text="Adicionar →", style="Add.TButton",
                cursor="hand2", command=on_adicionar).grid(row=1, column=3, sticky="w")

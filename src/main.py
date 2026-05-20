@@ -10,6 +10,7 @@ import sys
 import os
 import tkinter as tk
 import traceback
+from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -17,7 +18,7 @@ from core.constants import BG, PANEL, INVESTIMENTOS, PRAZO_MIN, PRAZO_MAX, PRAZO
 from core.calculator import preparar_dados_grafico
 from infrastructure.storage.json_repository import (
     salvar_carteira, carregar_carteira,
-    salvar_cache_taxas, carregar_cache_taxas,
+    salvar_cache_taxas, carregar_cache_taxas, data_cache_taxas,
 )
 from ui.frames import (
     configurar_estilos, criar_header, criar_input_panel,
@@ -68,8 +69,17 @@ class App(tk.Tk):
         except Exception:
             self._taxas = carregar_cache_taxas()
 
+    def _formatar_data_atualizacao(self):
+        iso = data_cache_taxas()
+        if not iso:
+            return None
+        try:
+            return datetime.fromisoformat(iso).strftime("%d/%m/%Y %H:%M")
+        except (ValueError, TypeError):
+            return None
+
     def _montar_ui(self):
-        criar_header(self)
+        criar_header(self, self._formatar_data_atualizacao())
         self._refs = criar_input_panel(
             self, self._tipo_var, self._anos_var,
             on_adicionar=self._adicionar,
@@ -93,8 +103,12 @@ class App(tk.Tk):
         try:
             raw = entry.get().replace(".", "").replace(",", ".")
             valor = float(raw)
-            assert valor > 0
-        except Exception:
+        except ValueError:
+            entry.config(bg="#FEE2E2")
+            self.after(500, lambda: entry.config(bg=PANEL))
+            return
+
+        if valor <= 0:
             entry.config(bg="#FEE2E2")
             self.after(500, lambda: entry.config(bg=PANEL))
             return

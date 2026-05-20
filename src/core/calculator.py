@@ -2,6 +2,8 @@
 calculator.py — Cálculos financeiros e preparação de dados para o gráfico.
 """
 
+from datetime import datetime
+
 from core.constants import INVESTIMENTOS
 
 
@@ -21,6 +23,25 @@ def projetar_valor(valor, taxas_por_ano, ano_inicio, anos):
     return acumulado
 
 
+def projetar_cotacao(valor, cotacoes_por_ano, ano_inicio, anos):
+    # Para CAMBIO: vlr_mediana é cotação R$/USD, não taxa de juros.
+    # Valorização = cotação_final / cotação_inicial.
+    if not cotacoes_por_ano:
+        return valor
+
+    anos_disponiveis = sorted(cotacoes_por_ano.keys())
+    primeiro = anos_disponiveis[0]
+    ultimo = anos_disponiveis[-1]
+
+    cot_inicio = cotacoes_por_ano.get(ano_inicio, cotacoes_por_ano[primeiro])
+    cot_final = cotacoes_por_ano.get(ano_inicio + anos, cotacoes_por_ano[ultimo])
+
+    if cot_inicio <= 0:
+        return valor
+
+    return valor * (cot_final / cot_inicio)
+
+
 def calcular_ganho(valor, valor_futuro):
     return valor_futuro - valor
 
@@ -35,8 +56,7 @@ def preparar_dados_grafico(itens_carteira, taxas_indicadores, anos, ano_inicio=N
     taxas_mapa = _organizar_taxas(taxas_indicadores)
 
     if ano_inicio is None:
-        todos_anos = [ano for taxas in taxas_mapa.values() for ano in taxas]
-        ano_inicio = min(todos_anos) if todos_anos else 2026
+        ano_inicio = datetime.now().year
 
     resultados = []
     for item in itens_carteira:
@@ -48,11 +68,15 @@ def preparar_dados_grafico(itens_carteira, taxas_indicadores, anos, ano_inicio=N
             continue
 
         taxas_por_ano = taxas_mapa.get(cod, {})
-        valor_futuro = projetar_valor(valor, taxas_por_ano, ano_inicio, anos)
 
-        if taxas_por_ano:
-            primeiro_ano = min(taxas_por_ano.keys())
-            taxa_exibicao = taxas_por_ano[primeiro_ano]
+        if cod == "CAMBIO":
+            valor_futuro = projetar_cotacao(valor, taxas_por_ano, ano_inicio, anos)
+        else:
+            valor_futuro = projetar_valor(valor, taxas_por_ano, ano_inicio, anos)
+
+        # Taxa anualizada equivalente: taxa fixa que produziria o mesmo valor_futuro.
+        if valor > 0 and anos > 0 and valor_futuro > 0:
+            taxa_exibicao = ((valor_futuro / valor) ** (1 / anos) - 1) * 100
         else:
             taxa_exibicao = 0.0
 
