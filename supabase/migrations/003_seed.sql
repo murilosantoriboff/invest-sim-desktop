@@ -7,6 +7,6 @@ values
   ('CAMBIO',   'Dólar',         'Câmbio', false),
   ('CDI',      'CDB 100% CDI',  null,     true),
   ('IGPM',     'IGP-M',         'IGP-M',  false),
-  ('IPCA',     'Tesouro IPCA+', 'IPCA',   false),
+  ('IPCA',     'Tesouro IPCA+', 'IPCA',   true),
   ('POUPANCA', 'Poupança',      null,     true),
   ('SELIC',    'Tesouro Selic', 'Selic',  false);
