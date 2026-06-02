@@ -5,7 +5,7 @@ tooltip.py — Tooltip em hover e janela de glossário dos investimentos.
 import tkinter as tk
 from tkinter import ttk
 
-from core.constants import INVESTIMENTOS, BG, PANEL, BORDER, TXT, TXT_SEC
+from core.constants import INVESTIMENTOS, BG, PANEL, BORDER, TXT, TXT_SEC, TOOLTIP_BG
 
 
 _DELAY_MS = 500
@@ -78,7 +78,7 @@ class Tooltip:
         frame.pack()
         label = tk.Label(
             frame, text=self._texto, justify="left",
-            bg="#FFFFE0", fg=TXT, font=("Arial", 9),
+            bg=TOOLTIP_BG, fg=TXT, font=("Arial", 9),
             wraplength=_WRAPLENGTH, padx=8, pady=6,
             bd=1, relief="solid",
         )

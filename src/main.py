@@ -15,7 +15,7 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from core.constants import BG, PANEL, INVESTIMENTOS, PRAZO_MIN, PRAZO_MAX, PRAZO_DEFAULT
+from core.constants import BG, PANEL, ERRO_BG, INVESTIMENTOS, PRAZO_MIN, PRAZO_MAX, PRAZO_DEFAULT
 from core.calculator import preparar_dados_grafico
 from infrastructure.storage.json_repository import (
     salvar_carteira, carregar_carteira,
@@ -105,15 +105,12 @@ class App(tk.Tk):
     def _adicionar(self):
         entry = self._refs["valor_entry"]
         try:
-            raw = entry.get().replace(".", "").replace(",", ".")
-            valor = float(raw)
+            valor = float(entry.get().replace(".", "").replace(",", "."))
         except ValueError:
-            entry.config(bg="#FEE2E2")
-            self.after(500, lambda: entry.config(bg=PANEL))
-            return
+            valor = 0
 
         if valor <= 0:
-            entry.config(bg="#FEE2E2")
+            entry.config(bg=ERRO_BG)
             self.after(500, lambda: entry.config(bg=PANEL))
             return
 

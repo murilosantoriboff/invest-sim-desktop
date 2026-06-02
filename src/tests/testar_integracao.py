@@ -10,30 +10,13 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from _runner import teste, aprox, resumo
 from infrastructure.storage import json_repository as repo
 from infrastructure.storage.json_repository import (
     salvar_carteira, carregar_carteira,
     salvar_cache_taxas, carregar_cache_taxas,
 )
 from core.calculator import preparar_dados_grafico, calcular_totais
-
-passed = 0
-failed = 0
-
-
-def teste(nome, condicao):
-    global passed, failed
-    if condicao:
-        print(f"  OK  {nome}")
-        passed += 1
-    else:
-        print(f"  FALHOU  {nome}")
-        failed += 1
-
-
-def aprox(a, b, tol=0.01):
-    return abs(a - b) < tol
-
 
 def fluxo_com_supabase():
     print("\n--- Fluxo com Supabase (online) ---\n")
@@ -128,8 +111,6 @@ def fluxo_com_cache():
 
 
 def main():
-    global passed, failed
-
     print("=" * 60)
     print("TESTE DE INTEGRAÇÃO — persistência + regra de negócio")
     print("=" * 60)
@@ -142,11 +123,7 @@ def main():
         fluxo_com_supabase()
         fluxo_com_cache()
 
-    print("\n" + "=" * 60)
-    print(f"RESULTADO: {passed} passaram, {failed} falharam")
-    print("=" * 60)
-
-    return 0 if failed == 0 else 1
+    return resumo()
 
 
 if __name__ == "__main__":

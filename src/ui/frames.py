@@ -7,7 +7,7 @@ from tkinter import ttk
 
 from core.constants import (
     INVESTIMENTOS, BG, PANEL, BORDER, HOVER, TXT, TXT_SEC, BLUE, BLUE_D, GREEN, RED,
-    CV_W, CV_H, CX, CY, R_EXT, R_INT, CARD_COLS, formatar_brl,
+    CARD_BG, CV_W, CV_H, CX, CY, R_EXT, R_INT, CARD_COLS, formatar_brl,
 )
 from core.calculator import calcular_totais
 from ui.tooltip import Tooltip, abrir_glossario
@@ -17,6 +17,11 @@ def _adicionar_hover(widget, bg_normal=BORDER, bg_hover=HOVER):
     """Escurece o fundo do widget ao passar o mouse (para tk.Button e tk.Label)."""
     widget.bind("<Enter>", lambda _e: widget.config(bg=bg_hover), add="+")
     widget.bind("<Leave>", lambda _e: widget.config(bg=bg_normal), add="+")
+
+
+def _bind_scroll(canvas, widget):
+    """Faz a rodinha do mouse rolar o canvas quando o ponteiro está sobre o widget."""
+    widget.bind("<MouseWheel>", lambda e: canvas.yview_scroll(int(-e.delta / 120), "units"))
 
 
 def configurar_estilos():
@@ -188,11 +193,8 @@ def criar_area_grafico(root):
     scroll_canvas.pack(side="left", fill="both", expand=True)
     # scrollbar não é packada agora — só quando necessário
 
-    def _on_mousewheel(event):
-        scroll_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-
-    scroll_canvas.bind("<MouseWheel>", _on_mousewheel)
-    legenda_frame.bind("<MouseWheel>", _on_mousewheel)
+    _bind_scroll(scroll_canvas, scroll_canvas)
+    _bind_scroll(scroll_canvas, legenda_frame)
 
     # guarda referências pro scroll condicional
     legenda_frame._scroll_canvas = scroll_canvas
@@ -277,7 +279,7 @@ def atualizar_legenda(legenda, dados_grafico):
         row = i // CARD_COLS
         col = i % CARD_COLS
 
-        card = tk.Frame(legenda, bg="#F0EEEB", padx=12, pady=10)
+        card = tk.Frame(legenda, bg=CARD_BG, padx=12, pady=10)
         card.grid(row=row, column=col, padx=(0, 8), pady=(0, 8), sticky="nw")
 
         descricao = INVESTIMENTOS.get(d.get("cod_investimento", ""), {}).get("descricao", "")
@@ -285,39 +287,36 @@ def atualizar_legenda(legenda, dados_grafico):
             Tooltip(card, descricao)
 
         # cabeçalho do card
-        header = tk.Frame(card, bg="#F0EEEB")
+        header = tk.Frame(card, bg=CARD_BG)
         header.pack(anchor="w")
         tk.Label(header, text="●", font=("Arial", 11),
-                 bg="#F0EEEB", fg=d["cor"]).pack(side="left")
+                 bg=CARD_BG, fg=d["cor"]).pack(side="left")
         tk.Label(header, text=f"  {d['nome_exibicao']}",
-                 font=("Arial", 10, "bold"), bg="#F0EEEB", fg=TXT).pack(side="left")
+                 font=("Arial", 10, "bold"), bg=CARD_BG, fg=TXT).pack(side="left")
 
         # valores
         tk.Label(card, text=f"Investido: {formatar_brl(d['valor'])}",
-                 font=("Arial", 9), bg="#F0EEEB", fg=TXT_SEC).pack(anchor="w", pady=(6, 0))
+                 font=("Arial", 9), bg=CARD_BG, fg=TXT_SEC).pack(anchor="w", pady=(6, 0))
         tk.Label(card, text=f"Projeção: {formatar_brl(d['valor_futuro'])}",
-                 font=("Arial", 9), bg="#F0EEEB", fg=TXT).pack(anchor="w")
+                 font=("Arial", 9), bg=CARD_BG, fg=TXT).pack(anchor="w")
 
         sinal = "+" if d['ganho'] >= 0 else "−"
         cor_ganho = GREEN if d['ganho'] >= 0 else RED
         tk.Label(
             card,
             text=f"Ganho: {sinal} {formatar_brl(abs(d['ganho']))} ({abs(d['percentual_ganho']):.1f}%)",
-            font=("Arial", 9), bg="#F0EEEB", fg=cor_ganho,
+            font=("Arial", 9), bg=CARD_BG, fg=cor_ganho,
         ).pack(anchor="w")
 
         tk.Label(card, text=f"Taxa: {d['taxa_exibicao']:.2f}% a.a.",
-                 font=("Arial", 9), bg="#F0EEEB", fg=TXT_SEC).pack(anchor="w")
+                 font=("Arial", 9), bg=CARD_BG, fg=TXT_SEC).pack(anchor="w")
 
     # bind mousewheel nos cards novos
     scroll_canvas = legenda._scroll_canvas
-    def _on_mousewheel(event):
-        scroll_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-
     for widget in legenda.winfo_children():
-        widget.bind("<MouseWheel>", _on_mousewheel)
+        _bind_scroll(scroll_canvas, widget)
         for child in widget.winfo_children():
-            child.bind("<MouseWheel>", _on_mousewheel)
+            _bind_scroll(scroll_canvas, child)
 
 
 def criar_chips_bar(root):

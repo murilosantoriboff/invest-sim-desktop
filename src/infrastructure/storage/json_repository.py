@@ -17,6 +17,17 @@ def _garantir_diretorio():
     os.makedirs(os.path.dirname(CARTEIRA_PATH), exist_ok=True)
 
 
+def _ler_json(path):
+    """Lê e devolve o conteúdo de um JSON, ou None se não existir / estiver corrompido."""
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, ValueError):
+        return None
+
+
 # ── Carteira ──────────────────────────────────────────────────────────────────
 
 def salvar_carteira(itens):
@@ -30,21 +41,20 @@ def salvar_carteira(itens):
 
 
 def carregar_carteira():
-    if not os.path.exists(CARTEIRA_PATH):
+    dados = _ler_json(CARTEIRA_PATH)
+    if not dados:
         return []
+    validados = []
     try:
-        with open(CARTEIRA_PATH, "r", encoding="utf-8") as f:
-            dados = json.load(f)
-        validados = []
         for item in dados.get("itens", []):
             if "cod_investimento" in item and "valor" in item:
                 validados.append({
                     "cod_investimento": str(item["cod_investimento"]),
                     "valor": float(item["valor"]),
                 })
-        return validados
-    except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+    except (KeyError, TypeError, ValueError):
         return []
+    return validados
 
 
 # ── Cache de taxas ────────────────────────────────────────────────────────────
@@ -60,22 +70,14 @@ def salvar_cache_taxas(indicadores):
 
 
 def carregar_cache_taxas():
-    if not os.path.exists(CACHE_TAXAS_PATH):
+    dados = _ler_json(CACHE_TAXAS_PATH)
+    if not dados:
         return []
-    try:
-        with open(CACHE_TAXAS_PATH, "r", encoding="utf-8") as f:
-            dados = json.load(f)
-        return dados.get("indicadores", [])
-    except (json.JSONDecodeError, KeyError, TypeError):
-        return []
+    return dados.get("indicadores", [])
 
 
 def data_cache_taxas():
-    if not os.path.exists(CACHE_TAXAS_PATH):
+    dados = _ler_json(CACHE_TAXAS_PATH)
+    if not dados:
         return None
-    try:
-        with open(CACHE_TAXAS_PATH, "r", encoding="utf-8") as f:
-            dados = json.load(f)
-        return dados.get("atualizado_em")
-    except (json.JSONDecodeError, KeyError, TypeError):
-        return None
+    return dados.get("atualizado_em")

@@ -59,7 +59,7 @@ with
       'IPCA'::text                                          as cod_investimento,
       'Tesouro IPCA+'::text                                 as des_investimento,
       ano_referencia,
-      ((1 + vlr_mediana / 100) * (1 + 7.0 / 100) - 1) * 100 as vlr_mediana,
+      round(((1 + vlr_mediana / 100) * (1 + 7.0 / 100) - 1) * 100, 6) as vlr_mediana,
       dat_indicador
     from ipca_focus
   )

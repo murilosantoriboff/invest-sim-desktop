@@ -9,6 +9,7 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from _runner import teste, aprox, resumo
 from core.calculator import (
     projetar_valor,
     projetar_cotacao,
@@ -19,27 +20,7 @@ from core.calculator import (
     _organizar_taxas,
 )
 
-passed = 0
-failed = 0
-
-
-def teste(nome, condicao):
-    global passed, failed
-    if condicao:
-        print(f"  OK  {nome}")
-        passed += 1
-    else:
-        print(f"  FALHOU  {nome}")
-        failed += 1
-
-
-def aprox(a, b, tol=0.01):
-    return abs(a - b) < tol
-
-
 def main():
-    global passed, failed
-
     print("=" * 60)
     print("TESTE — calculator.py")
     print("=" * 60)
@@ -166,11 +147,7 @@ def main():
     teste("Total futuro > investido", totais["total_futuro"] > totais["total_investido"])
     teste("Ganho > 0", totais["total_ganho"] > 0)
 
-    print("\n" + "=" * 60)
-    print(f"RESULTADO: {passed} passaram, {failed} falharam")
-    print("=" * 60)
-
-    return 0 if failed == 0 else 1
+    return resumo()
 
 
 if __name__ == "__main__":

@@ -13,6 +13,9 @@ GREEN    = "#16A34A"
 RED      = "#DC2626"
 BLUE     = "#3B6FE0"
 BLUE_D   = "#2952B8"
+CARD_BG    = "#F0EEEB"   # fundo dos cards da legenda
+ERRO_BG    = "#FEE2E2"   # fundo do campo quando o valor digitado é inválido
+TOOLTIP_BG = "#FFFFE0"   # fundo amarelo-claro do tooltip
 
 # Investimentos disponíveis (códigos alinhados com a vw_indicadores_investimento)
 INVESTIMENTOS = {

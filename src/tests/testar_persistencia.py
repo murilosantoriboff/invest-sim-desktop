@@ -10,6 +10,7 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from _runner import teste, resumo
 from infrastructure.storage import json_repository as repo
 from infrastructure.storage.json_repository import (
     salvar_carteira, carregar_carteira,
@@ -17,23 +18,7 @@ from infrastructure.storage.json_repository import (
     data_cache_taxas,
 )
 
-passed = 0
-failed = 0
-
-
-def teste(nome, condicao):
-    global passed, failed
-    if condicao:
-        print(f"  OK  {nome}")
-        passed += 1
-    else:
-        print(f"  FALHOU  {nome}")
-        failed += 1
-
-
 def main():
-    global passed, failed
-
     print("=" * 60)
     print("TESTE — json_repository.py")
     print("=" * 60)
@@ -101,11 +86,7 @@ def main():
         teste("Primeiro é SELIC 14.75%",
               cache[0]["cod_investimento"] == "SELIC" and cache[0]["vlr_mediana"] == 14.75)
 
-    print("\n" + "=" * 60)
-    print(f"RESULTADO: {passed} passaram, {failed} falharam")
-    print("=" * 60)
-
-    return 0 if failed == 0 else 1
+    return resumo()
 
 
 if __name__ == "__main__":
