@@ -58,7 +58,7 @@ invest-sim-desktop/
 │   │   ├── storage/
 │   │   │   └── json_repository.py      # persistência local
 │   │   └── pdf_export.py               # exportação da simulação em PDF
-│   └── tests/
+│   └── testes/
 │       ├── testar_persistencia.py
 │       ├── testar_calculator.py
 │       └── testar_integracao.py

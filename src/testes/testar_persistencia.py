@@ -1,7 +1,7 @@
 """
 testar_persistencia.py — Testa o json_repository.py.
 
-Rodar a partir de src/: python tests/testar_persistencia.py
+Rodar a partir de src/: python testes/testar_persistencia.py
 """
 
 import sys

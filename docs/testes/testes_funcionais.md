@@ -114,10 +114,10 @@ Para rodar a suíte completa de validações funcionais, execute os comandos a p
 
 ```bash
 # Para testar a matemática e regras do motor de cálculo
-python tests/testar_calculator.py
+python testes/testar_calculator.py
 
 # Para testar o salvamento de arquivos e cache local
-python tests/testar_persistencia.py
+python testes/testar_persistencia.py
 
 # Para testar o fluxo completo juntando tudo (Online e Offline)
-python tests/testar_integracao.py
+python testes/testar_integracao.py

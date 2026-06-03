@@ -1,7 +1,7 @@
 """
 testar_calculator.py — Testa o calculator.py.
 
-Rodar a partir de src/: python tests/testar_calculator.py
+Rodar a partir de src/: python testes/testar_calculator.py
 """
 
 import sys

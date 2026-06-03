@@ -59,12 +59,12 @@ A carteira do usuário é carregada do JSON local com `carregar_carteira()`. Ret
 
 ## Validação
 
-`src/tests/testar_integracao.py` testa o fluxo completo:
+`src/testes/testar_integracao.py` testa o fluxo completo:
 
 - **Online**: busca do Supabase → salva cache → calcula
 - **Offline**: cache simulado → salva/carrega carteira → calcula → adicionar/remover
 
-Rodar a partir de `src/`: `python tests/testar_integracao.py`
+Rodar a partir de `src/`: `python testes/testar_integracao.py`
 
 ---
 

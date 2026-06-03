@@ -67,9 +67,9 @@ O dicionário `INVESTIMENTOS` mapeia cada código pra nome de exibição e cor. 
 
 ## Validação
 
-`src/tests/testar_calculator.py` — 30 cenários cobrindo projeção com taxa fixa e variável, projeção cambial por cotação, taxa anualizada equivalente, auxiliares, organização de taxas e integração com dados do Supabase.
+`src/testes/testar_calculator.py` — 30 cenários cobrindo projeção com taxa fixa e variável, projeção cambial por cotação, taxa anualizada equivalente, auxiliares, organização de taxas e integração com dados do Supabase.
 
-Rodar a partir de `src/`: `python tests/testar_calculator.py`
+Rodar a partir de `src/`: `python testes/testar_calculator.py`
 
 ---
 

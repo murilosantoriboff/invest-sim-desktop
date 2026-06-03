@@ -1,7 +1,7 @@
 """
 testar_integracao.py — Fluxo completo: persistência + regra de negócio.
 
-Rodar a partir de src/: python tests/testar_integracao.py
+Rodar a partir de src/: python testes/testar_integracao.py
 """
 
 import sys
