@@ -20,7 +20,7 @@ supabase_client.buscar_indicadores()
             dados prontos pro gráfico
                     │
                     ▼
-            frames.desenhar_grafico()
+            interface.desenhar_grafico()
 ```
 
 ## Detalhamento
@@ -52,10 +52,10 @@ A carteira do usuário é carregada do JSON local com `carregar_carteira()`. Ret
 | Camada | Módulo | Papel |
 |---|---|---|
 | Persistência remota | `supabase_client.py` | Busca taxas do Supabase |
-| Persistência local | `json_repository.py` | Cache de taxas + carteira |
+| Persistência local | `armazenamento.py` | Cache de taxas + carteira |
 | Regra de negócio | `calculator.py` | Projeção financeira |
 | Configuração | `constants.py` | Investimentos e cores |
-| Interface | `frames.py` | Gráfico e interação |
+| Interface | `interface.py` | Gráfico e interação |
 
 ## Validação
 

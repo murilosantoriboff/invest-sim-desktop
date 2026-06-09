@@ -7,8 +7,8 @@ O sistema trabalha com dois tipos de dados em locais diferentes:
 | Dado | Onde fica | Quem escreve | Quem lê |
 |---|---|---|---|
 | Indicadores de mercado (Selic, CDI, IPCA, etc.) | Supabase (PostgreSQL) | Edge Function automática | `supabase_client.py` |
-| Cache local das taxas | `data/cache_taxas.json` | `json_repository.py` | `json_repository.py` |
-| Carteira do usuário | `data/carteira.json` | `json_repository.py` | `json_repository.py` |
+| Cache local das taxas | `data/cache_taxas.json` | `armazenamento.py` | `armazenamento.py` |
+| Carteira do usuário | `data/carteira.json` | `armazenamento.py` | `armazenamento.py` |
 
 ---
 
@@ -85,7 +85,7 @@ Salva os investimentos que o usuário adicionou no simulador. Exemplo do arquivo
 }
 ```
 
-Funções disponíveis em `json_repository.py`:
+Funções disponíveis em `armazenamento.py`:
 - `salvar_carteira(itens)` — recebe lista de dicts e grava no JSON
 - `carregar_carteira()` → retorna lista de dicts (vazia se não existir)
 

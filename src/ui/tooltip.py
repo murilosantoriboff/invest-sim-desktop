@@ -1,5 +1,5 @@
 """
-tooltip.py — Tooltip em hover e janela de glossário dos investimentos.
+Tooltip em hover e janela de glossário dos investimentos.
 """
 
 import tkinter as tk
@@ -27,8 +27,8 @@ class Tooltip:
         self._after_id = self._widget.after(_DELAY_MS, self._mostrar)
 
     def _on_leave(self, _event=None):
-        # Confere depois de um tick se o ponteiro saiu mesmo do widget e descendentes.
-        # Isso evita esconder ao passar para um filho (Label dentro de Frame).
+        # Confere depois de um tick se o ponteiro saiu mesmo do widget,
+        # senão o tooltip some ao passar para um filho (Label dentro de Frame).
         self._widget.after(30, self._verificar_saida)
 
     def _on_press(self, _event=None):
@@ -36,18 +36,16 @@ class Tooltip:
         self._esconder()
 
     def _verificar_saida(self):
-        try:
-            x, y = self._widget.winfo_pointerxy()
-            alvo = self._widget.winfo_containing(x, y)
-        except Exception:
-            alvo = None
+        if not self._widget.winfo_exists():
+            self._esconder()
+            return
+        x, y = self._widget.winfo_pointerxy()
+        alvo = self._widget.winfo_containing(x, y)
         if not self._eh_descendente(alvo):
             self._cancelar()
             self._esconder()
 
     def _eh_descendente(self, alvo):
-        if alvo is None:
-            return False
         atual = alvo
         while atual is not None:
             if atual is self._widget:
@@ -57,16 +55,16 @@ class Tooltip:
 
     def _cancelar(self):
         if self._after_id is not None:
-            try:
-                self._widget.after_cancel(self._after_id)
-            except Exception:
-                pass
+            self._widget.after_cancel(self._after_id)
             self._after_id = None
 
     def _mostrar(self):
         if self._top is not None or not self._texto:
             return
+        if not self._widget.winfo_exists():
+            return
 
+        # rootx/rooty são coordenadas absolutas, funciona em mais de um monitor
         x = self._widget.winfo_rootx() + 12
         y = self._widget.winfo_rooty() + self._widget.winfo_height() + 6
 
@@ -74,31 +72,20 @@ class Tooltip:
         top.wm_overrideredirect(True)
         top.attributes("-topmost", True)
 
-        frame = tk.Frame(top, bg=TXT, bd=0)
-        frame.pack()
         label = tk.Label(
-            frame, text=self._texto, justify="left",
+            top, text=self._texto, justify="left",
             bg=TOOLTIP_BG, fg=TXT, font=("Arial", 9),
             wraplength=_WRAPLENGTH, padx=8, pady=6,
             bd=1, relief="solid",
         )
         label.pack()
 
-        # Posiciona usando coordenadas absolutas do widget (rootx/rooty já
-        # consideram o desktop virtual, então funciona em múltiplos monitores).
-        # Evitamos clampar com winfo_screenwidth/height porque no Windows essas
-        # funções retornam apenas o monitor primário, jogando o tooltip pra tela
-        # errada quando o app está num monitor secundário.
         top.wm_geometry(f"+{x}+{y}")
-
         self._top = top
 
     def _esconder(self):
         if self._top is not None:
-            try:
-                self._top.destroy()
-            except Exception:
-                pass
+            self._top.destroy()
             self._top = None
 
 
@@ -107,16 +94,11 @@ def abrir_glossario(root):
     win.title("Glossário de Investimentos")
     win.configure(bg=BG)
     win.transient(root)
-    try:
-        win.grab_set()
-    except Exception:
-        pass
 
+    # centraliza em relação à janela principal
     largura = 520
     altura = 480
     root.update_idletasks()
-    # Centraliza relativo ao root (funciona em qualquer monitor — rootx/rooty
-    # já estão em coordenadas absolutas do desktop virtual).
     x = root.winfo_rootx() + (root.winfo_width() // 2) - (largura // 2)
     y = root.winfo_rooty() + (root.winfo_height() // 2) - (altura // 2)
     win.geometry(f"{largura}x{altura}+{x}+{y}")

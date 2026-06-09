@@ -1,5 +1,5 @@
 """
-frames.py — Interface do simulador (Tkinter puro).
+Interface do simulador (Tkinter puro).
 """
 
 import tkinter as tk
@@ -7,10 +7,21 @@ from tkinter import ttk
 
 from core.constants import (
     INVESTIMENTOS, BG, PANEL, BORDER, HOVER, TXT, TXT_SEC, BLUE, BLUE_D, GREEN, RED,
-    CARD_BG, CV_W, CV_H, CX, CY, R_EXT, R_INT, CARD_COLS, formatar_brl,
+    CARD_BG, formatar_brl,
 )
 from core.calculator import calcular_totais
 from ui.tooltip import Tooltip, abrir_glossario
+
+# Dimensões do gráfico de rosca
+CV_W = 400
+CV_H = 400
+CX = CV_W // 2
+CY = CV_H // 2
+R_EXT = 150
+R_INT = 85
+
+# Quantos cards por linha na legenda
+CARD_COLS = 4
 
 
 def _adicionar_hover(widget, bg_normal=BORDER, bg_hover=HOVER):
@@ -164,11 +175,11 @@ def criar_input_panel(root, tipo_var, anos_var, on_adicionar, on_mudar_anos):
 
     tk.Frame(root, bg=BORDER, height=1).pack(fill="x")
 
-    return {"valor_entry": valor_entry, "pill_btns": pill_btns}
+    return valor_entry
 
 
 def criar_area_grafico(root):
-    """Gráfico à esquerda, grid de cards à direita com scroll condicional."""
+    """Gráfico à esquerda, grid de cards à direita com scroll."""
     area = tk.Frame(root, bg=BG)
     area.pack(fill="both", expand=True, padx=30, pady=10)
 
@@ -177,42 +188,26 @@ def criar_area_grafico(root):
                        bg=BG, highlightthickness=0)
     canvas.pack(side="left", anchor="n")
 
-    # lado direito: container com scroll condicional
+    # lado direito: legenda com scroll
     right = tk.Frame(area, bg=BG)
     right.pack(side="left", fill="both", expand=True, padx=(15, 0))
 
     scroll_canvas = tk.Canvas(right, bg=BG, highlightthickness=0)
     scrollbar = ttk.Scrollbar(right, orient="vertical", command=scroll_canvas.yview)
-
-    legenda_frame = tk.Frame(scroll_canvas, bg=BG)
-
-    legenda_frame.bind("<Configure>", lambda e: _atualizar_scroll(scroll_canvas, scrollbar))
-    scroll_canvas.create_window((0, 0), window=legenda_frame, anchor="nw")
     scroll_canvas.configure(yscrollcommand=scrollbar.set)
 
     scroll_canvas.pack(side="left", fill="both", expand=True)
-    # scrollbar não é packada agora — só quando necessário
+    scrollbar.pack(side="right", fill="y")
+
+    legenda_frame = tk.Frame(scroll_canvas, bg=BG)
+    scroll_canvas.create_window((0, 0), window=legenda_frame, anchor="nw")
+    legenda_frame.bind("<Configure>",
+                       lambda e: scroll_canvas.configure(scrollregion=scroll_canvas.bbox("all")))
 
     _bind_scroll(scroll_canvas, scroll_canvas)
     _bind_scroll(scroll_canvas, legenda_frame)
 
-    # guarda referências pro scroll condicional
-    legenda_frame._scroll_canvas = scroll_canvas
-    legenda_frame._scrollbar = scrollbar
-
     return canvas, legenda_frame
-
-
-def _atualizar_scroll(scroll_canvas, scrollbar):
-    scroll_canvas.configure(scrollregion=scroll_canvas.bbox("all"))
-    scroll_canvas.update_idletasks()
-    content_h = scroll_canvas.bbox("all")
-    visible_h = scroll_canvas.winfo_height()
-    if content_h and visible_h > 1 and content_h[3] > visible_h:
-        scrollbar.pack(side="right", fill="y")
-    else:
-        scrollbar.pack_forget()
-        scroll_canvas.yview_moveto(0)
 
 
 def desenhar_grafico(canvas, dados_grafico, anos):
@@ -311,12 +306,13 @@ def atualizar_legenda(legenda, dados_grafico):
         tk.Label(card, text=f"Taxa: {d['taxa_exibicao']:.2f}% a.a.",
                  font=("Arial", 9), bg=CARD_BG, fg=TXT_SEC).pack(anchor="w")
 
-    # bind mousewheel nos cards novos
-    scroll_canvas = legenda._scroll_canvas
+    # bind mousewheel nos cards novos (legenda.master é o canvas de scroll)
+    scroll_canvas = legenda.master
     for widget in legenda.winfo_children():
         _bind_scroll(scroll_canvas, widget)
         for child in widget.winfo_children():
             _bind_scroll(scroll_canvas, child)
+    scroll_canvas.yview_moveto(0)
 
 
 def criar_chips_bar(root):

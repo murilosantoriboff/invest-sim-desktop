@@ -10,30 +10,32 @@ Os dados de mercado (taxas Selic, CDI, IPCA) vêm do Supabase, que é alimentado
 
 ## Camadas do sistema
 
+Cada camada tem a sua pasta dentro de `src/`:
+
 ### Camada de Apresentação — `src/ui/`
 
 Responsável por tudo que o usuário vê e interage.
 
-- `frames.py` — monta as telas do Tkinter (header, painel de input, gráfico de rosca, legenda, chips da carteira), configura os estilos visuais e gerencia os eventos
+- `interface.py` — monta as telas do Tkinter (header, painel de input, gráfico de rosca, legenda, chips da carteira), configura os estilos visuais e gerencia os eventos
 - `tooltip.py` — componente reutilizável de tooltip em hover (aparece após ~500ms ao passar o mouse) e a janela do glossário de investimentos (acessada pelo botão "?" no header)
 
-Essa camada não faz cálculo nenhum e não acessa banco de dados. Ela só chama a camada de negócio e exibe o resultado.
+Essa camada não faz cálculo nenhum e não acessa banco de dados. Ela só chama as funções de cálculo e exibe o resultado.
 
 ### Camada de Regra de Negócio — `src/core/`
 
 O coração do sistema. Aqui ficam os cálculos e as regras.
 
 - `calculator.py` — implementa juros compostos com taxas variáveis por ano, prepara os dados pro gráfico, calcula totais da carteira
-- `constants.py` — constantes globais: dimensões do canvas, cores, mapeamento de investimentos
+- `constants.py` — constantes globais: cores, prazos, mapeamento de investimentos
 
 Nenhuma dependência de Tkinter ou Supabase aqui. Funções puras, fáceis de testar.
 
-### Camada de Persistência — `src/infrastructure/`
+### Camada de Dados — `src/dados/`
 
 Cuida de ler e gravar dados, seja na nuvem ou localmente.
 
-- `database/supabase_client.py` — conecta ao Supabase e consulta a view `vw_indicadores_investimento`
-- `storage/json_repository.py` — salva e carrega a carteira do usuário e o cache de taxas em arquivos JSON locais
+- `supabase_client.py` — conecta ao Supabase e consulta a view `vw_indicadores_investimento`
+- `armazenamento.py` — salva e carrega a carteira do usuário e o cache de taxas em arquivos JSON locais
 - `pdf_export.py` — gera um PDF da simulação atual (título, tabela com cada investimento e totais) usando a biblioteca `fpdf2`
 
 ---
@@ -56,16 +58,16 @@ O simulador só lê dessa view. Nunca escreve nada no Supabase.
 Usuário abre o app
   └── supabase_client busca taxas
         └── [sem conexão] usa cache local
-  └── json_repository carrega carteira salva
+  └── armazenamento carrega carteira salva
 
 Usuário adiciona investimento
-  └── frames.py captura input → valida
+  └── interface.py captura input → valida
   └── calculator.py calcula projeção
-  └── frames.py desenha gráfico e legenda
-  └── json_repository salva carteira
+  └── interface.py desenha gráfico e legenda
+  └── armazenamento salva carteira
 
 Usuário muda prazo
-  └── calculator recalcula → frames redesenha
+  └── calculator recalcula → interface redesenha
 ```
 
 ---
@@ -74,17 +76,17 @@ Usuário muda prazo
 
 ```
 main.py (orquestrador)
-  ├── chama → frames.py (interface)
+  ├── chama → interface.py (telas)
   ├── chama → calculator.py (projeções)
   ├── chama → supabase_client.py (taxas na inicialização)
-  ├── chama → json_repository.py (salvar/carregar carteira e cache)
+  ├── chama → armazenamento.py (salvar/carregar carteira e cache)
   └── chama → pdf_export.py (ao clicar em "Exportar PDF")
 
 calculator.py
   └── depende de → constants.py (mapeamento de investimentos)
 
-frames.py
-  └── depende de → constants.py (cores, dimensões, descrições)
+interface.py
+  └── depende de → constants.py (cores, descrições)
   └── depende de → calculator.py (calcular_totais para o gráfico)
   └── depende de → tooltip.py (tooltips em hover e janela do glossário)
 

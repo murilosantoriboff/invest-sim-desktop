@@ -8,7 +8,7 @@ O sistema tem três camadas:
 
 - A interface (pasta ui), que é tudo que o usuário vê. Ela não faz conta nem mexe em banco, só pega o que o usuário fez, pede pra camada de cálculo resolver e desenha o resultado na tela.
 - A regra de negócio (pasta core), que são as funções de cálculo. Recebe os dados, faz as contas e devolve. Ela não sabe nem que existe Tkinter ou Supabase.
-- A persistência (pasta infrastructure), que cuida de guardar e buscar dados: o Supabase pras taxas do Banco Central e os arquivos JSON pra carteira e pro cache. O PDF também ficou aqui porque gera arquivo.
+- Os dados (pasta dados), que cuida de guardar e buscar informação: o Supabase pras taxas do Banco Central e os arquivos JSON pra carteira e pro cache. O pdf_export.py também ficou aqui porque gera arquivo.
 
 Quem junta tudo isso é o main.py. Ele é o único arquivo que conhece as três camadas ao mesmo tempo.
 

@@ -1,5 +1,5 @@
 """
-calculator.py — Cálculos financeiros e preparação de dados para o gráfico.
+Cálculos financeiros e preparação de dados para o gráfico.
 """
 
 from datetime import datetime
@@ -85,13 +85,13 @@ def preparar_dados_grafico(itens_carteira, taxas_indicadores, anos, ano_inicio=N
 
         resultados.append({
             "cod_investimento": cod,
-            "nome_exibicao":    config["nome_exibicao"],
-            "valor":            valor,
-            "valor_futuro":     round(valor_futuro, 2),
-            "ganho":            round(ganho, 2),
+            "nome_exibicao": config["nome_exibicao"],
+            "valor": valor,
+            "valor_futuro": round(valor_futuro, 2),
+            "ganho": round(ganho, 2),
             "percentual_ganho": round(pct, 1),
-            "taxa_exibicao":    taxa_exibicao,
-            "cor":              config["cor"],
+            "taxa_exibicao": taxa_exibicao,
+            "cor": config["cor"],
         })
 
     return resultados
@@ -104,9 +104,9 @@ def calcular_totais(dados_grafico):
     pct = calcular_percentual_ganho(total_inv, total_ganho)
 
     return {
-        "total_investido":        round(total_inv, 2),
-        "total_futuro":           round(total_fut, 2),
-        "total_ganho":            round(total_ganho, 2),
+        "total_investido": round(total_inv, 2),
+        "total_futuro": round(total_fut, 2),
+        "total_ganho": round(total_ganho, 2),
         "percentual_ganho_total": round(pct, 1),
     }
 

@@ -1,5 +1,5 @@
 """
-json_repository.py — Persistência local em arquivos JSON.
+Persistência local em arquivos JSON (carteira do usuário e cache de taxas).
 """
 
 import json
@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 
 _DIR = os.path.dirname(os.path.abspath(__file__))
-_DATA_DIR = os.path.join(_DIR, "..", "..", "..", "data")
+_DATA_DIR = os.path.join(_DIR, "..", "..", "data")
 
 CARTEIRA_PATH = os.path.join(_DATA_DIR, "carteira.json")
 CACHE_TAXAS_PATH = os.path.join(_DATA_DIR, "cache_taxas.json")
@@ -28,7 +28,7 @@ def _ler_json(path):
         return None
 
 
-# ── Carteira ──────────────────────────────────────────────────────────────────
+# Carteira
 
 def salvar_carteira(itens):
     _garantir_diretorio()
@@ -44,20 +44,10 @@ def carregar_carteira():
     dados = _ler_json(CARTEIRA_PATH)
     if not dados:
         return []
-    validados = []
-    try:
-        for item in dados.get("itens", []):
-            if "cod_investimento" in item and "valor" in item:
-                validados.append({
-                    "cod_investimento": str(item["cod_investimento"]),
-                    "valor": float(item["valor"]),
-                })
-    except (KeyError, TypeError, ValueError):
-        return []
-    return validados
+    return dados.get("itens", [])
 
 
-# ── Cache de taxas ────────────────────────────────────────────────────────────
+# Cache de taxas
 
 def salvar_cache_taxas(indicadores):
     _garantir_diretorio()

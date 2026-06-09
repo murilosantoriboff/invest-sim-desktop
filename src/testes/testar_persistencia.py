@@ -1,5 +1,5 @@
 """
-testar_persistencia.py — Testa o json_repository.py.
+testar_persistencia.py — Testa o armazenamento.py.
 
 Rodar a partir de src/: python testes/testar_persistencia.py
 """
@@ -11,8 +11,8 @@ import tempfile
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from _runner import teste, resumo
-from infrastructure.storage import json_repository as repo
-from infrastructure.storage.json_repository import (
+import dados.armazenamento as repo
+from dados.armazenamento import (
     salvar_carteira, carregar_carteira,
     salvar_cache_taxas, carregar_cache_taxas,
     data_cache_taxas,
@@ -20,7 +20,7 @@ from infrastructure.storage.json_repository import (
 
 def main():
     print("=" * 60)
-    print("TESTE — json_repository.py")
+    print("TESTE — armazenamento.py")
     print("=" * 60)
 
     # Usa um diretório temporário pra não tocar nos dados reais do app

@@ -11,8 +11,8 @@ import tempfile
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from _runner import teste, aprox, resumo
-from infrastructure.storage import json_repository as repo
-from infrastructure.storage.json_repository import (
+import dados.armazenamento as repo
+from dados.armazenamento import (
     salvar_carteira, carregar_carteira,
     salvar_cache_taxas, carregar_cache_taxas,
 )
@@ -21,7 +21,7 @@ from core.calculator import preparar_dados_grafico, calcular_totais
 def fluxo_com_supabase():
     print("\n--- Fluxo com Supabase (online) ---\n")
     try:
-        from infrastructure.database.supabase_client import buscar_indicadores
+        from dados.supabase_client import buscar_indicadores
     except ImportError:
         print("  PULOU  lib supabase não instalada\n")
         return

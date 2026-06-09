@@ -50,18 +50,17 @@ invest-sim-desktop/
 │   │   ├── calculator.py               # cálculos financeiros
 │   │   └── constants.py                # configurações e constantes
 │   ├── ui/
-│   │   ├── frames.py                   # interface Tkinter
+│   │   ├── interface.py                # interface Tkinter
 │   │   └── tooltip.py                  # tooltips em hover + janela do glossário
-│   ├── infrastructure/
-│   │   ├── database/
-│   │   │   └── supabase_client.py      # acesso ao Supabase
-│   │   ├── storage/
-│   │   │   └── json_repository.py      # persistência local
+│   ├── dados/
+│   │   ├── supabase_client.py          # acesso ao Supabase
+│   │   ├── armazenamento.py            # persistência local em JSON
 │   │   └── pdf_export.py               # exportação da simulação em PDF
 │   └── testes/
 │       ├── testar_persistencia.py
 │       ├── testar_calculator.py
-│       └── testar_integracao.py
+│       ├── testar_integracao.py
+│       └── testar_desempenho.py
 ├── supabase/
 │   ├── functions/
 │   │   └── f_indicadores_bcb/index.ts  # Edge Function (ETL do BCB)
@@ -72,7 +71,10 @@ invest-sim-desktop/
 ├── docs/
 │   ├── arquitetura/
 │   ├── api/
-│   └── rastreabilidade/
+│   ├── interface/
+│   ├── testes/
+│   ├── rastreabilidade/
+│   └── decisoes/
 ├── .gitignore
 └── requirements.txt
 ```
@@ -86,10 +88,10 @@ invest-sim-desktop/
 | 03 | Regra de negócio | Concluído |
 | 04 | Integração inicial | Concluído |
 | 05 | Interface | Concluído |
-| 06 | Integração completa | Em andamento |
-| 07 | Testes funcionais | Aguardando |
-| 08 | Testes não funcionais | Aguardando |
-| 09 | Refinamento final | Aguardando |
+| 06 | Integração completa | Concluído |
+| 07 | Testes funcionais | Concluído |
+| 08 | Testes não funcionais | Concluído |
+| 09 | Refinamento final | Em andamento |
 
 ---
 

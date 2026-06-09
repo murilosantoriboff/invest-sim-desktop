@@ -6,7 +6,7 @@ Este documento foi feito para explicar, de forma simples e direta, o que cada um
 
 ## 1. Testes do Motor de Cálculo (`testar_calculator.py`)
 
-Estes testes validam isoladamente as funções matemáticas e de mapeamento contidas no motor de cálculo (`core/calculator`), garantindo que as projeções financeiras sigam as regras de negocio.
+Estes testes validam isoladamente as funções matemáticas e de mapeamento contidas no motor de cálculo (`calculator.py`), garantindo que as projeções financeiras sigam as regras de negocio.
 
 ### 1.1 Projeção de Valor Futuro
 * **Cenário 1: Juros Compostos Fixos**
@@ -51,7 +51,7 @@ Estes testes validam isoladamente as funções matemáticas e de mapeamento cont
 
 ## 2. Testes de Persistência Local (`testar_persistencia.py`)
 
-Valida o comportamento do componente `json_repository.py` na leitura, escrita e resiliência de falhas dos arquivos locais de configuração e dados da carteira.
+Valida o comportamento do componente `armazenamento.py` na leitura, escrita e resiliência de falhas dos arquivos locais de configuração e dados da carteira.
 
 ### 2.1 Salvando e Carregando a Carteira (`carteira.json`)
 * **Cenário 1: Começando do Zero**
@@ -76,7 +76,7 @@ Valida o comportamento do componente `json_repository.py` na leitura, escrita e 
 
 Estes testes juntam todas as peças do quebra-cabeça. Eles fazem o fluxo completo: buscam os dados (do supabase ou no cache), salvam no arquivo local, mandam pro motor de cálculo e geram os resultados finais.
 
-[Supabase / Cache] ──> [JSON Repository] ──> [Core Calculator] ──> [Resultados Finais]
+[Supabase / Cache] ──> [Armazenamento JSON] ──> [Calculator] ──> [Resultados Finais]
 
 
 ### 3.1 Fluxo Online (Conectado com o Supabase)

@@ -1,5 +1,5 @@
 """
-main.py — Ponto de entrada do Simulador de Investimentos.
+Ponto de entrada do Simulador de Investimentos.
 
 Rodar de dentro da pasta src/:
     cd src
@@ -7,21 +7,19 @@ Rodar de dentro da pasta src/:
 """
 
 import sys
-import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import traceback
 from datetime import datetime
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
 from core.constants import BG, PANEL, ERRO_BG, INVESTIMENTOS, PRAZO_MIN, PRAZO_MAX, PRAZO_DEFAULT
 from core.calculator import preparar_dados_grafico
-from infrastructure.storage.json_repository import (
+from dados.armazenamento import (
     salvar_carteira, carregar_carteira,
     salvar_cache_taxas, carregar_cache_taxas, data_cache_taxas,
 )
-from ui.frames import (
+from dados.pdf_export import exportar_pdf
+from ui.interface import (
     configurar_estilos, criar_header, criar_input_panel,
     criar_area_grafico, desenhar_grafico, atualizar_legenda,
     criar_chips_bar, atualizar_chips,
@@ -50,28 +48,24 @@ class App(tk.Tk):
         self._recalcular()
         self._redesenhar()
 
-        # tamanho da janela
-        self.update_idletasks()
-        screen_w = self.winfo_screenwidth()
-        screen_h = self.winfo_screenheight()
-        win_w = min(1280, screen_w - 100)
-        win_h = min(720, screen_h - 80)
-        x = (screen_w - win_w) // 2
-        y = (screen_h - win_h) // 2 - 20
-        self.geometry(f"{win_w}x{win_h}+{x}+{y}")
+        # janela 1280x720 centralizada na tela
+        x = (self.winfo_screenwidth() - 1280) // 2
+        y = (self.winfo_screenheight() - 720) // 2
+        self.geometry(f"1280x720+{x}+{y}")
         self.minsize(1280, 720)
-        self.resizable(True, True)
 
     def _carregar_taxas(self):
+        # tenta buscar do Supabase; se der qualquer erro, usa o cache local
         try:
-            from infrastructure.database.supabase_client import buscar_indicadores
+            from dados.supabase_client import buscar_indicadores
             taxas = buscar_indicadores()
-            if taxas:
-                self._taxas = taxas
-                salvar_cache_taxas(taxas)
-            else:
-                self._taxas = carregar_cache_taxas()
         except Exception:
+            taxas = []
+
+        if taxas:
+            self._taxas = taxas
+            salvar_cache_taxas(taxas)
+        else:
             self._taxas = carregar_cache_taxas()
 
     def _formatar_data_atualizacao(self):
@@ -88,7 +82,7 @@ class App(tk.Tk):
             self, self._formatar_data_atualizacao(),
             on_exportar_pdf=self._exportar_pdf,
         )
-        self._refs = criar_input_panel(
+        self._valor_entry = criar_input_panel(
             self, self._tipo_var, self._anos_var,
             on_adicionar=self._adicionar,
             on_mudar_anos=self._mudar_anos,
@@ -107,7 +101,7 @@ class App(tk.Tk):
         atualizar_chips(self._chip_bar, self._carteira, self._remover)
 
     def _adicionar(self):
-        entry = self._refs["valor_entry"]
+        entry = self._valor_entry
         try:
             valor = float(entry.get().replace(".", "").replace(",", "."))
         except ValueError:
@@ -142,7 +136,6 @@ class App(tk.Tk):
         self._redesenhar()
 
     def _exportar_pdf(self):
-        from infrastructure.pdf_export import exportar_pdf
         nome_padrao = f"simulacao_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
         caminho = filedialog.asksaveasfilename(
             parent=self, title="Salvar simulação como PDF",

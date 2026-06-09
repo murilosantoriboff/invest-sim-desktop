@@ -1,5 +1,5 @@
 """
-supabase_client.py — Acesso aos dados remotos do Supabase.
+Acesso aos dados remotos do Supabase.
 """
 
 from supabase import create_client
@@ -8,11 +8,7 @@ SUPABASE_URL = "https://gmrwxpkovgsmzlyoxjyy.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdtcnd4cGtvdmdzbXpseW94anl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDcwODksImV4cCI6MjA4ODIyMzA4OX0.plWL1pT5kENCD1w05B1ankZmXD3fq3-FLW3AZrhpl7M"
 
 
-def _get_client():
-    return create_client(SUPABASE_URL, SUPABASE_KEY)
-
-
 def buscar_indicadores():
-    cliente = _get_client()
+    cliente = create_client(SUPABASE_URL, SUPABASE_KEY)
     resposta = cliente.table("vw_indicadores_investimento").select("*").execute()
     return resposta.data

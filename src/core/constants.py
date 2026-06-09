@@ -1,5 +1,5 @@
 """
-constants.py — Constantes e configurações globais do simulador.
+Constantes e configurações globais do simulador.
 """
 
 # Cores
@@ -50,17 +50,6 @@ INVESTIMENTOS = {
         "descricao": "Variação da cotação do dólar americano frente ao real. Funciona como proteção contra desvalorização da moeda local.",
     },
 }
-
-# Gráfico
-CV_W  = 400
-CV_H  = 400
-CX    = CV_W // 2
-CY    = CV_H // 2
-R_EXT = 150
-R_INT = 85
-
-# Legenda grid
-CARD_COLS = 4
 
 # Prazo
 PRAZO_MIN = 1
