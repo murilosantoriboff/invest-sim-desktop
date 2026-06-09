@@ -34,4 +34,4 @@ python testes/testar_desempenho.py
 
 O script abre e fecha uma janela rapidamente, que é a medição do tempo de abertura do app.
 
-*Última atualização: Semana 9 — 09/06/2026*
+*Última atualização: 09/06/2026*
