@@ -311,7 +311,7 @@ def criar_chips_bar(root):
     return chip_outer
 
 
-def atualizar_chips(chip_outer, itens_carteira, on_remover):
+def atualizar_chips(chip_outer, itens_carteira, on_remover, on_editar):
     chip_outer.config(state="normal")
     chip_outer.delete("1.0", "end")
 
@@ -331,6 +331,11 @@ def atualizar_chips(chip_outer, itens_carteira, on_remover):
                  bg=PANEL, fg=config["cor"], padx=6).pack(side="left")
         tk.Label(chip, text=f"{config['nome_exibicao']} · {valor_fmt}",
                  font=("Arial", 9), bg=PANEL, fg=TXT).pack(side="left")
+        # o glifo do lápis desenha abaixo da linha de base; o pady compensa
+        tk.Button(chip, text="🖉", font=("Arial", 11),
+                  bg=PANEL, fg=TXT_SEC, relief="flat", bd=0,
+                  cursor="hand2", padx=2,
+                  command=lambda k=i: on_editar(k)).pack(side="left", pady=(0, 3))
         tk.Button(chip, text="×", font=("Arial", 9),
                   bg=PANEL, fg=TXT_SEC, relief="flat", bd=0,
                   cursor="hand2", padx=6,

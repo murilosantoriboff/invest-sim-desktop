@@ -2,7 +2,7 @@
 
 import sys
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, simpledialog
 import traceback
 from datetime import datetime
 
@@ -18,6 +18,14 @@ from ui.interface import (
     criar_area_grafico, desenhar_grafico, atualizar_legenda,
     criar_chips_bar, atualizar_chips,
 )
+
+
+def _converter_valor(texto):
+    # aceita o formato brasileiro: ponto de milhar e vírgula decimal ("10.000,50")
+    try:
+        return float(texto.replace(".", "").replace(",", "."))
+    except ValueError:
+        return 0
 
 
 class App(tk.Tk):
@@ -90,14 +98,11 @@ class App(tk.Tk):
     def _redesenhar(self):
         desenhar_grafico(self._canvas, self._dados_grafico, self._anos_var.get())
         atualizar_legenda(self._legenda, self._dados_grafico)
-        atualizar_chips(self._chip_bar, self._carteira, self._remover)
+        atualizar_chips(self._chip_bar, self._carteira, self._remover, self._editar)
 
     def _adicionar(self):
         entry = self._valor_entry
-        try:
-            valor = float(entry.get().replace(".", "").replace(",", "."))
-        except ValueError:
-            valor = 0
+        valor = _converter_valor(entry.get())
 
         if valor <= 0:
             entry.config(bg=ERRO_BG)
@@ -111,6 +116,25 @@ class App(tk.Tk):
         salvar_carteira(self._carteira)
         entry.delete(0, "end")
         entry.insert(0, "10000")
+        self._recalcular()
+        self._redesenhar()
+
+    def _editar(self, idx):
+        item = self._carteira[idx]
+        atual = f"{item['valor']:.2f}".replace(".", ",")
+        resposta = simpledialog.askstring(
+            "Editar valor", "Novo valor (R$):",
+            initialvalue=atual, parent=self,
+        )
+        if resposta is None:
+            return
+
+        valor = _converter_valor(resposta)
+        if valor <= 0:
+            return
+
+        item["valor"] = valor
+        salvar_carteira(self._carteira)
         self._recalcular()
         self._redesenhar()
 
