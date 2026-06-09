@@ -91,7 +91,7 @@ invest-sim-desktop/
 | 06 | Integração completa | Concluído |
 | 07 | Testes funcionais | Concluído |
 | 08 | Testes não funcionais | Concluído |
-| 09 | Refinamento final | Em andamento |
+| 09 | Refinamento final | Concluído |
 
 ---
 

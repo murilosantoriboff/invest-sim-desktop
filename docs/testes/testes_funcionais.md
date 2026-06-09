@@ -108,7 +108,7 @@ Para entender rápido o foco de cada arquivo de teste:
 
 ---
 
-## 5. Instrucoes para
+## 5. Instruções para rodar os testes
 
 Para rodar a suíte completa de validações funcionais, execute os comandos a partir da raiz da pasta `src/`:
 
@@ -121,3 +121,4 @@ python testes/testar_persistencia.py
 
 # Para testar o fluxo completo juntando tudo (Online e Offline)
 python testes/testar_integracao.py
+```
