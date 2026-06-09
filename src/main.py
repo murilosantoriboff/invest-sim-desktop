@@ -65,8 +65,12 @@ class App(tk.Tk):
     def _carregar_taxas(self):
         try:
             from infrastructure.database.supabase_client import buscar_indicadores
-            self._taxas = buscar_indicadores()
-            salvar_cache_taxas(self._taxas)
+            taxas = buscar_indicadores()
+            if taxas:
+                self._taxas = taxas
+                salvar_cache_taxas(taxas)
+            else:
+                self._taxas = carregar_cache_taxas()
         except Exception:
             self._taxas = carregar_cache_taxas()
 
