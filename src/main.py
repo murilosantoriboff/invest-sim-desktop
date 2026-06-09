@@ -1,10 +1,4 @@
-"""
-Ponto de entrada do Simulador de Investimentos.
-
-Rodar de dentro da pasta src/:
-    cd src
-    python main.py
-"""
+"""Simulador de Investimentos. Rodar de dentro da pasta src/: python main.py"""
 
 import sys
 import tkinter as tk
@@ -48,14 +42,12 @@ class App(tk.Tk):
         self._recalcular()
         self._redesenhar()
 
-        # janela 1280x720 centralizada na tela
         x = (self.winfo_screenwidth() - 1280) // 2
         y = (self.winfo_screenheight() - 720) // 2
         self.geometry(f"1280x720+{x}+{y}")
         self.minsize(1280, 720)
 
     def _carregar_taxas(self):
-        # tenta buscar do Supabase; se der qualquer erro, usa o cache local
         try:
             from dados.supabase_client import buscar_indicadores
             taxas = buscar_indicadores()

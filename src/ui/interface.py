@@ -1,6 +1,4 @@
-"""
-Interface do simulador (Tkinter puro).
-"""
+"""Interface do simulador (Tkinter puro)."""
 
 import tkinter as tk
 from tkinter import ttk
@@ -12,7 +10,7 @@ from core.constants import (
 from core.calculator import calcular_totais
 from ui.tooltip import Tooltip, abrir_glossario
 
-# Dimensões do gráfico de rosca
+# dimensões do gráfico de rosca
 CV_W = 400
 CV_H = 400
 CX = CV_W // 2
@@ -20,18 +18,15 @@ CY = CV_H // 2
 R_EXT = 150
 R_INT = 85
 
-# Quantos cards por linha na legenda
 CARD_COLS = 4
 
 
 def _adicionar_hover(widget, bg_normal=BORDER, bg_hover=HOVER):
-    """Escurece o fundo do widget ao passar o mouse (para tk.Button e tk.Label)."""
     widget.bind("<Enter>", lambda _e: widget.config(bg=bg_hover), add="+")
     widget.bind("<Leave>", lambda _e: widget.config(bg=bg_normal), add="+")
 
 
 def _bind_scroll(canvas, widget):
-    """Faz a rodinha do mouse rolar o canvas quando o ponteiro está sobre o widget."""
     widget.bind("<MouseWheel>", lambda e: canvas.yview_scroll(int(-e.delta / 120), "units"))
 
 
@@ -98,7 +93,6 @@ def criar_header(root, data_atualizacao=None, on_exportar_pdf=None):
 
 
 def _validar_valor(novo_texto):
-    # Aceita dígitos, ponto (separador de milhar) e vírgula (decimal, no máximo 1).
     if novo_texto == "":
         return True
     if not all(c.isdigit() or c in ".," for c in novo_texto):
@@ -179,16 +173,13 @@ def criar_input_panel(root, tipo_var, anos_var, on_adicionar, on_mudar_anos):
 
 
 def criar_area_grafico(root):
-    """Gráfico à esquerda, grid de cards à direita com scroll."""
     area = tk.Frame(root, bg=BG)
     area.pack(fill="both", expand=True, padx=30, pady=10)
 
-    # gráfico à esquerda
     canvas = tk.Canvas(area, width=CV_W, height=CV_H,
                        bg=BG, highlightthickness=0)
     canvas.pack(side="left", anchor="n")
 
-    # lado direito: legenda com scroll
     right = tk.Frame(area, bg=BG)
     right.pack(side="left", fill="both", expand=True, padx=(15, 0))
 
@@ -281,7 +272,6 @@ def atualizar_legenda(legenda, dados_grafico):
         if descricao:
             Tooltip(card, descricao)
 
-        # cabeçalho do card
         header = tk.Frame(card, bg=CARD_BG)
         header.pack(anchor="w")
         tk.Label(header, text="●", font=("Arial", 11),
@@ -289,7 +279,6 @@ def atualizar_legenda(legenda, dados_grafico):
         tk.Label(header, text=f"  {d['nome_exibicao']}",
                  font=("Arial", 10, "bold"), bg=CARD_BG, fg=TXT).pack(side="left")
 
-        # valores
         tk.Label(card, text=f"Investido: {formatar_brl(d['valor'])}",
                  font=("Arial", 9), bg=CARD_BG, fg=TXT_SEC).pack(anchor="w", pady=(6, 0))
         tk.Label(card, text=f"Projeção: {formatar_brl(d['valor_futuro'])}",
@@ -306,7 +295,6 @@ def atualizar_legenda(legenda, dados_grafico):
         tk.Label(card, text=f"Taxa: {d['taxa_exibicao']:.2f}% a.a.",
                  font=("Arial", 9), bg=CARD_BG, fg=TXT_SEC).pack(anchor="w")
 
-    # bind mousewheel nos cards novos (legenda.master é o canvas de scroll)
     scroll_canvas = legenda.master
     for widget in legenda.winfo_children():
         _bind_scroll(scroll_canvas, widget)

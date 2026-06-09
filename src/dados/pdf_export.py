@@ -1,6 +1,4 @@
-"""
-Exporta a simulação atual para um PDF simples (texto + tabela).
-"""
+"""Exporta a simulação atual para um PDF simples (texto + tabela)."""
 
 from datetime import datetime
 

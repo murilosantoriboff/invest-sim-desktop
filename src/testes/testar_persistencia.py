@@ -1,8 +1,4 @@
-"""
-testar_persistencia.py — Testa o armazenamento.py.
-
-Rodar a partir de src/: python testes/testar_persistencia.py
-"""
+"""Testes do armazenamento.py. Rodar a partir de src/: python testes/testar_persistencia.py"""
 
 import sys
 import os
@@ -20,10 +16,10 @@ from dados.armazenamento import (
 
 def main():
     print("=" * 60)
-    print("TESTE — armazenamento.py")
+    print("TESTE - armazenamento.py")
     print("=" * 60)
 
-    # Usa um diretório temporário pra não tocar nos dados reais do app
+    # pasta temporária pra não mexer nos dados reais
     with tempfile.TemporaryDirectory() as tmpdir:
         repo.CARTEIRA_PATH = os.path.join(tmpdir, "carteira.json")
         repo.CACHE_TAXAS_PATH = os.path.join(tmpdir, "cache_taxas.json")

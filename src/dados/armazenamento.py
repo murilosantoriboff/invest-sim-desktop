@@ -1,6 +1,4 @@
-"""
-Persistência local em arquivos JSON (carteira do usuário e cache de taxas).
-"""
+"""Persistência local em arquivos JSON (carteira do usuário e cache de taxas)."""
 
 import json
 import os
@@ -18,7 +16,6 @@ def _garantir_diretorio():
 
 
 def _ler_json(path):
-    """Lê e devolve o conteúdo de um JSON, ou None se não existir / estiver corrompido."""
     if not os.path.exists(path):
         return None
     try:

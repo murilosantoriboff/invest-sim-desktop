@@ -1,6 +1,4 @@
-"""
-Cálculos financeiros e preparação de dados para o gráfico.
-"""
+"""Cálculos financeiros e preparação de dados para o gráfico."""
 
 from datetime import datetime
 
@@ -24,8 +22,7 @@ def projetar_valor(valor, taxas_por_ano, ano_inicio, anos):
 
 
 def projetar_cotacao(valor, cotacoes_por_ano, ano_inicio, anos):
-    # Para CAMBIO: vlr_mediana é cotação R$/USD, não taxa de juros.
-    # Valorização = cotação_final / cotação_inicial.
+    # no CAMBIO a vlr_mediana é cotação R$/USD, não taxa de juros
     if not cotacoes_por_ano:
         return valor
 
@@ -74,7 +71,7 @@ def preparar_dados_grafico(itens_carteira, taxas_indicadores, anos, ano_inicio=N
         else:
             valor_futuro = projetar_valor(valor, taxas_por_ano, ano_inicio, anos)
 
-        # Taxa anualizada equivalente: taxa fixa que produziria o mesmo valor_futuro.
+        # taxa fixa equivalente que daria o mesmo valor futuro
         if valor > 0 and anos > 0 and valor_futuro > 0:
             taxa_exibicao = ((valor_futuro / valor) ** (1 / anos) - 1) * 100
         else:

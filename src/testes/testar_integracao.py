@@ -1,8 +1,4 @@
-"""
-testar_integracao.py — Fluxo completo: persistência + regra de negócio.
-
-Rodar a partir de src/: python testes/testar_integracao.py
-"""
+"""Teste de integração (persistência + cálculo). Rodar a partir de src/: python testes/testar_integracao.py"""
 
 import sys
 import os
@@ -112,10 +108,10 @@ def fluxo_com_cache():
 
 def main():
     print("=" * 60)
-    print("TESTE DE INTEGRAÇÃO — persistência + regra de negócio")
+    print("TESTE DE INTEGRAÇÃO - persistência + regra de negócio")
     print("=" * 60)
 
-    # Usa um diretório temporário pra não tocar nos dados reais do app
+    # pasta temporária pra não mexer nos dados reais
     with tempfile.TemporaryDirectory() as tmpdir:
         repo.CARTEIRA_PATH = os.path.join(tmpdir, "carteira.json")
         repo.CACHE_TAXAS_PATH = os.path.join(tmpdir, "cache_taxas.json")

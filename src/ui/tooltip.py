@@ -1,6 +1,4 @@
-"""
-Tooltip em hover e janela de glossário dos investimentos.
-"""
+"""Tooltip em hover e janela de glossário dos investimentos."""
 
 import tkinter as tk
 from tkinter import ttk
@@ -27,8 +25,7 @@ class Tooltip:
         self._after_id = self._widget.after(_DELAY_MS, self._mostrar)
 
     def _on_leave(self, _event=None):
-        # Confere depois de um tick se o ponteiro saiu mesmo do widget,
-        # senão o tooltip some ao passar para um filho (Label dentro de Frame).
+        # confere depois de um tick, senão o tooltip some ao passar pro filho do widget
         self._widget.after(30, self._verificar_saida)
 
     def _on_press(self, _event=None):
@@ -64,7 +61,6 @@ class Tooltip:
         if not self._widget.winfo_exists():
             return
 
-        # rootx/rooty são coordenadas absolutas, funciona em mais de um monitor
         x = self._widget.winfo_rootx() + 12
         y = self._widget.winfo_rooty() + self._widget.winfo_height() + 6
 
@@ -95,7 +91,6 @@ def abrir_glossario(root):
     win.configure(bg=BG)
     win.transient(root)
 
-    # centraliza em relação à janela principal
     largura = 520
     altura = 480
     root.update_idletasks()
@@ -115,7 +110,6 @@ def abrir_glossario(root):
 
     tk.Frame(win, bg=BORDER, height=1).pack(fill="x", padx=20)
 
-    # Área com scroll vertical
     scroll_wrap = tk.Frame(win, bg=BG)
     scroll_wrap.pack(fill="both", expand=True, padx=20, pady=10)
 

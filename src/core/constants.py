@@ -1,6 +1,4 @@
-"""
-Constantes e configurações globais do simulador.
-"""
+"""Constantes e configurações globais do simulador."""
 
 # Cores
 BG       = "#F7F5F2"
@@ -13,11 +11,11 @@ GREEN    = "#16A34A"
 RED      = "#DC2626"
 BLUE     = "#3B6FE0"
 BLUE_D   = "#2952B8"
-CARD_BG    = "#F0EEEB"   # fundo dos cards da legenda
-ERRO_BG    = "#FEE2E2"   # fundo do campo quando o valor digitado é inválido
-TOOLTIP_BG = "#FFFFE0"   # fundo amarelo-claro do tooltip
+CARD_BG    = "#F0EEEB"
+ERRO_BG    = "#FEE2E2"
+TOOLTIP_BG = "#FFFFE0"
 
-# Investimentos disponíveis (códigos alinhados com a vw_indicadores_investimento)
+# códigos iguais aos da vw_indicadores_investimento
 INVESTIMENTOS = {
     "SELIC": {
         "nome_exibicao": "Tesouro Selic",
@@ -58,5 +56,4 @@ PRAZO_DEFAULT = 5
 
 
 def formatar_brl(valor):
-    """Formata valor numérico pro padrão brasileiro (ponto como separador de milhar)."""
     return f"R$ {valor:,.0f}".replace(",", ".")

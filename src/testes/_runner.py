@@ -1,10 +1,4 @@
-"""
-_runner.py — Funções auxiliares compartilhadas pelos testes.
-
-Não é um teste em si: centraliza o contador de resultados e os helpers
-teste() / aprox() / resumo() usados pelos três arquivos testar_*.py,
-evitando repetir o mesmo código em cada um.
-"""
+"""Helpers compartilhados pelos testes: teste(), aprox() e resumo()."""
 
 _passou = 0
 _falhou = 0

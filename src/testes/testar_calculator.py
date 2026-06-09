@@ -1,8 +1,4 @@
-"""
-testar_calculator.py — Testa o calculator.py.
-
-Rodar a partir de src/: python testes/testar_calculator.py
-"""
+"""Testes do calculator.py. Rodar a partir de src/: python testes/testar_calculator.py"""
 
 import sys
 import os
@@ -22,7 +18,7 @@ from core.calculator import (
 
 def main():
     print("=" * 60)
-    print("TESTE — calculator.py")
+    print("TESTE - calculator.py")
     print("=" * 60)
 
     print("\n--- Projeção de valor ---\n")
@@ -121,8 +117,6 @@ def main():
         [{"cod_investimento": "BITCOIN", "valor": 1000.0}], taxas_supabase, anos=1)
     teste("Investimento desconhecido é ignorado", len(dados_inv) == 0)
 
-    # taxa_exibicao deve ser a taxa anualizada equivalente (média geométrica),
-    # não a taxa do primeiro ano do mapa
     taxas_decrescentes = [
         {"cod_investimento": "SELIC", "ano_referencia": 2026, "vlr_mediana": 13.25},
         {"cod_investimento": "SELIC", "ano_referencia": 2027, "vlr_mediana": 11.50},

@@ -1,6 +1,4 @@
-"""
-Acesso aos dados remotos do Supabase.
-"""
+"""Acesso aos dados remotos do Supabase."""
 
 from supabase import create_client
 
