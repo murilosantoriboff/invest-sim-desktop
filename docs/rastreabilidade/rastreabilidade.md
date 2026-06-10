@@ -1,40 +1,41 @@
 # Rastreabilidade
 
+Este documento liga cada requisito ao código que o implementa e ao teste que o valida. Os testes automáticos são os scripts de src/testes; o que é visual foi verificado manualmente na interface.
+
 ## Regra de negócio
 
 | Requisito | Procedimento | Código | Teste | Resultado |
 |---|---|---|---|---|
-| Render com juros compostos | Aplica a taxa ano a ano em cima do valor | `core/calculator.py` → `projetar_valor()` | auto — `testar_calculator` cen. 1 a 4 | OK |
-| Usar taxa diferente pra cada ano | Pega a taxa de cada ano de referência; se acabar, repete a última | `core/calculator.py` → `projetar_valor()` | auto — `testar_calculator` cen. 3 e 4 | OK |
-| Projetar o Dólar pela cotação | Multiplica pela razão cotação_final / cotação_inicial (não é %) | `core/calculator.py` → `projetar_cotacao()` | auto — `testar_calculator` cen. 10 a 12 | OK |
-| Mostrar a taxa equivalente no card | Calcula a média geométrica das taxas do período | `core/calculator.py` → `preparar_dados_grafico()` | auto — `testar_calculator` cen. 9 | OK |
-| Somar os totais da carteira | Agrega investido, futuro e ganho de todos os itens | `core/calculator.py` → `calcular_totais()` | auto — `testar_calculator` cen. 5 e 6 | OK |
-| Ignorar ativo sem taxa | Item que não tem taxa cadastrada fica de fora do gráfico | `core/calculator.py` → `preparar_dados_grafico()` | auto — `testar_calculator` cen. 8 | OK |
+| Render com juros compostos | Aplica a taxa ano a ano em cima do valor | projetar_valor em calculator.py | auto: testar_calculator, bloco de projeção de valor | OK |
+| Usar taxa diferente pra cada ano | Pega a taxa de cada ano de referência; se acabar, repete a última | projetar_valor em calculator.py | auto: testar_calculator, casos de taxas variáveis | OK |
+| Projetar o Dólar pela cotação | Multiplica pela razão entre cotação final e inicial (não é %) | projetar_cotacao em calculator.py | auto: testar_calculator, bloco do CAMBIO | OK |
+| Mostrar a taxa equivalente no card | Calcula a média geométrica das taxas do período | preparar_dados_grafico em calculator.py | auto: testar_calculator, caso da taxa de exibição | OK |
+| Somar os totais da carteira | Agrega investido, futuro e ganho de todos os itens | calcular_totais em calculator.py | auto: testar_calculator, bloco de totais | OK |
+| Ignorar ativo sem taxa | Item sem taxa cadastrada fica de fora do gráfico | preparar_dados_grafico em calculator.py | auto: testar_calculator, caso do ativo desconhecido | OK |
 
 ## Persistência
 
 | Requisito | Procedimento | Código | Teste | Resultado |
 |---|---|---|---|---|
-| Salvar a carteira | Grava os itens num JSON local | `dados/armazenamento.py` → `salvar_carteira()` | auto — `testar_persistencia` cen. 2 e 3 | OK |
-| Carregar a carteira | Lê o JSON na inicialização (vazia se for a 1ª vez) | `dados/armazenamento.py` → `carregar_carteira()` | auto — `testar_persistencia` cen. 1 a 3 | OK |
-| Não quebrar com JSON corrompido | Se o arquivo tiver lixo, devolve lista vazia em vez de crashar | `dados/armazenamento.py` → `carregar_carteira()` / `_ler_json()` | auto — `testar_persistencia` cen. 4 | OK |
-| Guardar cache das taxas | Salva as taxas pra usar offline depois | `dados/armazenamento.py` → `salvar_cache_taxas()` | auto — `testar_persistencia` cen. 6 | OK |
-| Usar cache quando offline | Se o Supabase falhar, lê as taxas do cache | `dados/armazenamento.py` → `carregar_cache_taxas()` | auto — `testar_persistencia` cen. 5 e 6 | OK |
-| Buscar taxas reais do BCB | Consulta a view no Supabase e traz as taxas | `dados/supabase_client.py` → `buscar_indicadores()` | auto — `testar_integracao` cen. 1 e 2 | OK |
+| Salvar a carteira | Grava os itens num JSON local | salvar_carteira em armazenamento.py | auto: testar_persistencia, bloco da carteira | OK |
+| Carregar a carteira | Lê o JSON na inicialização (vazia se for a 1ª vez) | carregar_carteira em armazenamento.py | auto: testar_persistencia, bloco da carteira | OK |
+| Não quebrar com JSON corrompido | Arquivo com lixo devolve lista vazia em vez de crashar | carregar_carteira em armazenamento.py | auto: testar_persistencia, caso do arquivo corrompido | OK |
+| Guardar cache das taxas | Salva as taxas pra usar offline depois | salvar_cache_taxas em armazenamento.py | auto: testar_persistencia, bloco do cache | OK |
+| Usar cache quando offline | Se o Supabase falhar, lê as taxas do cache | carregar_cache_taxas em armazenamento.py | auto: testar_integracao, fluxo offline | OK |
+| Buscar taxas reais do BCB | Consulta a view no Supabase e traz as taxas | buscar_indicadores em supabase_client.py | auto: testar_integracao, fluxo online | OK |
 
 ## Interface e fluxo
 
 | Requisito | Procedimento | Código | Teste | Resultado |
 |---|---|---|---|---|
-| Adicionar investimento | Pega valor + tipo, valida, joga na carteira e salva | `main.py` → `_adicionar()` + `ui/interface.py` | auto — `testar_integracao` cen. 4 / manual | OK |
-| Remover investimento | Clica no "x" do chip e tira da carteira | `main.py` → `_remover()` + `ui/interface.py` | auto — `testar_integracao` cen. 4 / manual | OK |
-| Escolher prazo de 1 a 30 anos | Botões + e − ajustam o prazo e recalculam | `main.py` → `_mudar_anos()` | auto — `testar_integracao` cen. 4 / manual | OK |
-| Recusar valor inválido | Valor ≤ 0 faz o campo piscar vermelho e não cria nada | `main.py` → `_adicionar()` | manual | OK |
-| Desenhar gráfico de rosca + legenda | Monta o donut e a legenda com o detalhe de cada item | `ui/interface.py` → `desenhar_grafico()` / `atualizar_legenda()` | manual | OK |
-| Tooltips e glossário | Texto explicativo no hover e janela do "?" | `ui/tooltip.py` | manual | OK |
-| Exportar a simulação em PDF | Abre a janela de salvar e gera o PDF com a tabela | `dados/pdf_export.py` → `exportar_pdf()` | manual | OK |
-| Mostrar data da última atualização | Formata a data que veio do cache pro header | `main.py` → `_formatar_data_atualizacao()` | manual | OK |
+| Adicionar investimento | Pega valor e tipo, valida, joga na carteira e salva | _adicionar em main.py | auto: testar_integracao, fluxo offline; e manual | OK |
+| Editar investimento | O lápis do chip abre janela pra digitar o novo valor | _editar em main.py | manual | OK |
+| Remover investimento | Clica no x do chip e tira da carteira | _remover em main.py | auto: testar_integracao, fluxo offline; e manual | OK |
+| Escolher prazo de 1 a 30 anos | Botões de mais e menos ajustam o prazo e recalculam | _mudar_anos em main.py | auto: testar_integracao, fluxo offline; e manual | OK |
+| Recusar valor inválido | Valor zero ou negativo faz o campo piscar vermelho | _adicionar em main.py | manual | OK |
+| Desenhar gráfico de rosca e cards | Monta a rosca e os cards com o detalhe de cada item | desenhar_grafico e atualizar_legenda em interface.py | manual | OK |
+| Tooltips e glossário | Texto explicativo no hover e janela do botão de interrogação | tooltip.py | manual | OK |
+| Exportar a simulação em PDF | Abre a janela de salvar e gera o PDF com a tabela | exportar_pdf em pdf_export.py | manual | OK |
+| Mostrar data da última atualização | Formata a data do cache pro cabeçalho | _formatar_data_atualizacao em main.py | manual | OK |
 
----
-
-*Última atualização: Semana 8 — 02/06/2026*
+*Última atualização: 09/06/2026*
