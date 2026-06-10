@@ -1,56 +1,20 @@
 # Visão Geral da Arquitetura
 
-## Descrição
-
-O simulador é uma aplicação desktop feita em Python que roda localmente. A interface, os cálculos e o arquivo de dados ficam na própria máquina do usuário. O usuário informa um valor e um tipo de investimento, e o sistema desenha um gráfico mostrando quanto esse dinheiro vai render ao longo do tempo.
-
-Os dados de mercado (taxas Selic, CDI, IPCA) vêm do Supabase, que é alimentado diariamente pela API pública do Banco Central do Brasil. A carteira do usuário fica salva num arquivo JSON local.
+O simulador é uma aplicação desktop em Python que roda toda na máquina do usuário: interface, cálculos e arquivos de dados. O usuário informa um valor e um tipo de investimento e o sistema desenha um gráfico de rosca mostrando quanto esse dinheiro deve render no prazo escolhido. As taxas de mercado (Selic, CDI, IPCA e as demais) vêm do Supabase, que por sua vez é alimentado diariamente pela API pública do Banco Central. A carteira fica salva num JSON local.
 
 ---
 
-## Camadas do sistema
+## Camadas
 
-Cada camada tem a sua pasta dentro de `src/`:
+O código em src se divide em três pastas, uma por camada.
 
-### Camada de Apresentação — `src/ui/`
+A pasta ui é a apresentação. O interface.py monta as telas do Tkinter (cabeçalho, painel de entrada, gráfico de rosca, cards e os chips da carteira), configura os estilos e trata os eventos, e o tooltip.py cuida dos tooltips de hover e da janela do glossário, aberta pelo botão de interrogação. Essa camada não faz cálculo nem acessa banco, só exibe o que as outras devolvem.
 
-Responsável por tudo que o usuário vê e interage.
+A pasta core é a regra de negócio. O calculator.py implementa os juros compostos com taxas variáveis por ano, prepara os dados do gráfico e soma os totais da carteira, e o constants.py concentra cores, prazos e o mapeamento dos investimentos. Não tem nenhuma dependência de Tkinter ou Supabase aqui, o que deixa as funções fáceis de testar.
 
-- `interface.py` — monta as telas do Tkinter (header, painel de input, gráfico de rosca, legenda, chips da carteira), configura os estilos visuais e gerencia os eventos
-- `tooltip.py` — componente reutilizável de tooltip em hover (aparece após ~500ms ao passar o mouse) e a janela do glossário de investimentos (acessada pelo botão "?" no header)
+A pasta dados cuida de ler e gravar: o supabase_client.py consulta a view vw_indicadores_investimento, o armazenamento.py salva e carrega a carteira e o cache de taxas em JSON, e o pdf_export.py gera o PDF da simulação com a biblioteca fpdf2.
 
-Essa camada não faz cálculo nenhum e não acessa banco de dados. Ela só chama as funções de cálculo e exibe o resultado.
-
-### Camada de Regra de Negócio — `src/core/`
-
-O coração do sistema. Aqui ficam os cálculos e as regras.
-
-- `calculator.py` — implementa juros compostos com taxas variáveis por ano, prepara os dados pro gráfico, calcula totais da carteira
-- `constants.py` — constantes globais: cores, prazos, mapeamento de investimentos
-
-Nenhuma dependência de Tkinter ou Supabase aqui. Funções puras, fáceis de testar.
-
-### Camada de Dados — `src/dados/`
-
-Cuida de ler e gravar dados, seja na nuvem ou localmente.
-
-- `supabase_client.py` — conecta ao Supabase e consulta a view `vw_indicadores_investimento`
-- `armazenamento.py` — salva e carrega a carteira do usuário e o cache de taxas em arquivos JSON locais
-- `pdf_export.py` — gera um PDF da simulação atual (título, tabela com cada investimento e totais) usando a biblioteca `fpdf2`
-
----
-
-## Banco de dados (Supabase)
-
-O PostgreSQL no Supabase tem duas tabelas e uma view:
-
-- `cfg_indicadores_investimento` — configuração estática dos investimentos disponíveis
-- `stg_indicadores_bcb` — dados brutos da API Focus/BCB, atualizados diariamente por Edge Function
-- `vw_indicadores_investimento` — view que junta as duas tabelas e entrega as taxas prontas (CDI derivado da Selic, Poupança calculada conforme regra, etc.)
-
-O simulador só lê dessa view. Nunca escreve nada no Supabase.
-
----
+Quem amarra as três é o main.py, único arquivo que conhece todas as camadas ao mesmo tempo.
 
 ## Fluxo principal
 
@@ -108,4 +72,4 @@ Link: https://www.figma.com/board/nN0JSuSVPB9LzBQh5qHSJh/Hist%C3%B3rias-de-Usu%C
 
 ---
 
-*Última atualização: Semana 7 — 20/05/2026*
+*Última atualização: 09/06/2026*
