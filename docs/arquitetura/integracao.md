@@ -28,12 +28,12 @@ Depois disso o app fica esperando o usuário fazer alguma coisa.
 
 Adicionar investimento: o usuário digita o valor, escolhe o tipo e clica em adicionar. O programa valida o valor (se for zero ou negativo, o campo pisca vermelho e não faz nada), coloca o item na carteira, salva no JSON, recalcula tudo e redesenha o gráfico. São cinco passos, mas repara que ele passa pelas três camadas numa tacada só.
 
-Remover investimento: cada item da carteira tem um xizinho. Clicou, ele tira da carteira, salva de novo e redesenha.
+Editar investimento: cada chip da carteira tem um ícone de lápis. Clicando nele abre uma janela já preenchida com o valor atual, o usuário digita o novo valor e o programa salva e redesenha. Se cancelar ou digitar um valor inválido, fica tudo como estava.
+
+Remover investimento: do lado do lápis tem um X. Clicou, ele tira da carteira, salva de novo e redesenha.
 
 Mudar o prazo: tem os botões de mais e menos que vão de 1 até 30 anos. Aqui ele só recalcula e redesenha, não salva no JSON, porque o prazo é só um jeito de visualizar e não faz parte da carteira em si.
 
 Exportar PDF: clica no botão no cabeçalho, abre uma janela pra escolher onde salvar e o programa gera o PDF com a tabela da simulação.
 
----
-
-Última atualização: Semana 8 — 02/06/2026
+*Última atualização: 09/06/2026*

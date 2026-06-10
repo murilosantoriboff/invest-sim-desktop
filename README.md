@@ -2,37 +2,29 @@
 
 Trabalho da disciplina de Projeto Temático I - UCS
 
-**Grupo:** Grégori Barizon Muterle, Murilo Santori Boff, Pedro Henrique Scopel da Silva
-
----
+Grupo: Grégori Barizon Muterle, Murilo Santori Boff, Pedro Henrique Scopel da Silva
 
 ## Sobre o projeto
 
-Um simulador de investimentos desktop feito em Python. Você escolhe o tipo de investimento, coloca o valor e o prazo, e o programa mostra um gráfico de rosca com a projeção de rendimento.
+Um simulador de investimentos desktop feito em Python, com interface em Tkinter. Você escolhe o tipo de investimento, coloca o valor e o prazo, e o programa mostra um gráfico de rosca com a projeção de rendimento.
 
 As taxas são atualizadas automaticamente a partir da API do Banco Central do Brasil, armazenadas e tratadas em um banco PostgreSQL no Supabase. O simulador sempre usa os dados reais do mercado.
 
 ## Funcionalidades
 
-- Adicionar e remover investimentos da carteira
+- Adicionar, editar e remover investimentos da carteira
 - Simular vários investimentos ao mesmo tempo
 - Escolher o prazo de 1 a 30 anos
 - Gráfico de rosca mostrando a proporção de cada investimento
-- Legenda com detalhamento de cada aplicação (valor futuro, ganho, taxa)
-- Tooltips explicativos ao passar o mouse sobre cada tipo de investimento
-- Glossário completo dos investimentos disponíveis (botão "?" no canto superior direito)
+- Cards com o detalhamento de cada aplicação (valor futuro, ganho, taxa)
+- Tooltips explicativos e glossário completo dos investimentos (botão ? no cabeçalho)
 - Exportação da simulação atual em PDF
 - Taxas reais do BCB via Supabase (com cache offline)
 - Carteira salva localmente em JSON
 
-## Tecnologias
-
-- **Python** com Tkinter para a interface
-- **Supabase** (PostgreSQL) para os indicadores do BCB
-
 ## Como rodar
 
-```bash
+```
 git clone https://github.com/murilosantoriboff/invest-sim-desktop.git
 cd invest-sim-desktop
 pip install -r requirements.txt
@@ -42,47 +34,39 @@ python main.py
 
 ## Estrutura do projeto
 
+O código Python fica em src, separado em core (cálculos), ui (interface) e dados (Supabase, JSON local e PDF), com os scripts de teste em testes. A pasta supabase tem a Edge Function que busca os dados do BCB e as migrations do banco. A documentação de cada etapa está em docs.
+
 ```
 invest-sim-desktop/
 ├── src/
-│   ├── main.py                         # ponto de entrada
+│   ├── main.py
 │   ├── core/
-│   │   ├── calculator.py               # cálculos financeiros
-│   │   └── constants.py                # configurações e constantes
+│   │   ├── calculator.py
+│   │   └── constants.py
 │   ├── ui/
-│   │   ├── interface.py                # interface Tkinter
-│   │   └── tooltip.py                  # tooltips em hover + janela do glossário
+│   │   ├── interface.py
+│   │   └── tooltip.py
 │   ├── dados/
-│   │   ├── supabase_client.py          # acesso ao Supabase
-│   │   ├── armazenamento.py            # persistência local em JSON
-│   │   └── pdf_export.py               # exportação da simulação em PDF
+│   │   ├── supabase_client.py
+│   │   ├── armazenamento.py
+│   │   └── pdf_export.py
 │   └── testes/
-│       ├── testar_persistencia.py
 │       ├── testar_calculator.py
+│       ├── testar_persistencia.py
 │       ├── testar_integracao.py
 │       └── testar_desempenho.py
 ├── supabase/
 │   ├── functions/
-│   │   └── f_indicadores_bcb/index.ts  # Edge Function (ETL do BCB)
+│   │   └── f_indicadores_bcb/index.ts
 │   └── migrations/
-│       ├── 001_create_tables.sql
-│       ├── 002_create_views.sql
-│       └── 003_seed.sql
 ├── docs/
-│   ├── arquitetura/
-│   ├── api/
-│   ├── interface/
-│   ├── testes/
-│   ├── rastreabilidade/
-│   └── decisoes/
-├── .gitignore
 └── requirements.txt
 ```
 
 ## Status
 
 | Semana | Foco | Situação |
-|--------|------|----------|
+|---|---|---|
 | 01 | Setup e arquitetura | Concluído |
 | 02 | Persistência de dados | Concluído |
 | 03 | Regra de negócio | Concluído |

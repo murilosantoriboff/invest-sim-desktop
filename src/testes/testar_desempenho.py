@@ -1,5 +1,5 @@
 """
-testar_desempenho.py — Testes não funcionais de desempenho.
+testar_desempenho.py - testes não funcionais de desempenho.
 
 Mede o tempo das operações principais e confere se ficam dentro de
 limites aceitáveis. Os tempos medidos são impressos para registro.
