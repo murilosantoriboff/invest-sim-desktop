@@ -1,7 +1,5 @@
 # Modelo e Persistência de Dados
 
-## Visão geral
-
 O sistema trabalha com dois tipos de dados em locais diferentes:
 
 | Dado | Onde fica | Quem escreve | Quem lê |
@@ -12,129 +10,26 @@ O sistema trabalha com dois tipos de dados em locais diferentes:
 
 ---
 
-## Banco de dados — Supabase
+## Banco no Supabase
 
-### Tabelas
+São duas tabelas e uma view.
 
-**`cfg_indicadores_investimento`** — configuração estática dos investimentos.
+A cfg_indicadores_investimento é a configuração estática: uma linha por investimento, com o código (SELIC, CDI, IPCA, POUPANCA, IGPM, CAMBIO), o nome de exibição, o nome do indicador correspondente na API do BCB e uma marcação de quando a taxa é calculada a partir de outra, que é o caso do CDI e da Poupança, derivados da Selic.
 
-| Coluna | Tipo | Descrição |
-|---|---|---|
-| `cod_investimento` | varchar(20) PK | Código único (SELIC, CDI, IPCA, POUPANCA, IGPM, CAMBIO) |
-| `des_investimento` | varchar(100) | Nome de exibição (Tesouro Selic, CDB 100% CDI, etc.) |
-| `des_indicador` | varchar(100) | Nome do indicador na API do BCB (null se calculado) |
-| `ind_calculado` | boolean | Se true, a taxa é derivada da Selic (CDI e Poupança) |
+A stg_indicadores_bcb recebe os dados brutos extraídos da API Focus do Banco Central: nome do indicador, data da consulta, ano de referência da projeção, a mediana da expectativa de mercado e a data e hora em que o registro foi inserido.
 
-**`stg_indicadores_bcb`** — dados brutos extraídos da API Focus do Banco Central.
+A vw_indicadores_investimento é o que o simulador realmente consulta. Ela filtra só os registros da data mais recente, junta as duas tabelas e calcula as taxas derivadas: o CDI sai como Selic menos 0 10, e a Poupança como 70% da Selic quando esta fica até 8.5%, ou 6.17% fixos quando passa disso. O app recebe o código, o nome, o ano de referência, o valor e a data do indicador, tudo pronto pra usar.
 
-| Coluna | Tipo | Descrição |
-|---|---|---|
-| `id` | bigint (identity) | Chave primária |
-| `des_indicador` | text | Nome do indicador na API do BCB |
-| `dat_indicador` | date | Data da consulta |
-| `ano_referencia` | integer | Ano ao qual a projeção se refere |
-| `vlr_mediana` | numeric(15,6) | Valor mediana da expectativa de mercado (% a.a.) |
-| `dat_atualizacao` | timestamp | Data/hora em que o registro foi inserido |
+Quem alimenta a stg é a Edge Function f_indicadores_bcb, agendada pra rodar uma vez por dia no Supabase. Ela consulta a API pública de expectativas anuais do BCB, pega todos os registros da data mais recente disponível e grava na tabela, atualizando o que já existia.
 
-### View
+## Arquivos locais
 
-**`vw_indicadores_investimento`** — calcula as taxas derivadas.
+A carteira do usuário fica em data/carteira.json: um objeto com a data da última gravação e a lista de itens, cada item com o código do investimento e o valor aplicado. O armazenamento.py oferece a salvar_carteira, que recebe a lista e grava, e a carregar_carteira, que devolve a lista (vazia se o arquivo não existir ou estiver corrompido). Esse arquivo é regravado toda vez que o usuário adiciona, edita ou remove um investimento.
 
-Lógica:
-- Filtra apenas os registros da data mais recente em `stg_indicadores_bcb`
-- Junta com `cfg_indicadores_investimento` pelo `des_indicador`
-- Calcula CDI como `Selic - 0.10`
-- Calcula Poupança como `70% da Selic` quando Selic ≤ 8.5%, ou `6.17%` fixo quando Selic > 8.5%
-
-Colunas retornadas:
-
-| Coluna | Tipo | Exemplo |
-|---|---|---|
-| `cod_investimento` | text | "SELIC" |
-| `des_investimento` | text | "Tesouro Selic" |
-| `ano_referencia` | integer | 2025 |
-| `vlr_mediana` | numeric | 14.75 |
-| `dat_indicador` | date | "2026-04-14" |
-
-### Edge Function — `f_indicadores_bcb`
-
-Função do Supabase que executa o pipeline ETL:
-
-1. Consulta a API pública de expectativas do BCB (`ExpectativasMercadoAnuais`)
-2. Busca todos os registros da data mais recente disponível
-3. Faz upsert na tabela `stg_indicadores_bcb`
-
-Agendada para rodar diariamente no Supabase.
-
----
-
-## Persistência local — JSON
-
-### Carteira do usuário (`data/carteira.json`)
-
-Salva os investimentos que o usuário adicionou no simulador. Exemplo do arquivo:
-
-```json
-{
-  "atualizado_em": "2026-04-14T15:30:00.000000",
-  "itens": [
-    {"cod_investimento": "SELIC", "valor": 10000.0},
-    {"cod_investimento": "CDI", "valor": 5000.0},
-    {"cod_investimento": "POUPANCA", "valor": 3000.0}
-  ]
-}
-```
-
-Funções disponíveis em `armazenamento.py`:
-- `salvar_carteira(itens)` — recebe lista de dicts e grava no JSON
-- `carregar_carteira()` → retorna lista de dicts (vazia se não existir)
-
-### Cache de taxas (`data/cache_taxas.json`)
-
-Cópia local das taxas do Supabase para uso offline. Quando o app inicia, tenta buscar do Supabase e, se falhar, usa o cache. Exemplo:
-
-```json
-{
-  "atualizado_em": "2026-04-14T15:30:00.000000",
-  "indicadores": [
-    {
-      "cod_investimento": "SELIC",
-      "des_investimento": "Tesouro Selic",
-      "ano_referencia": 2025,
-      "vlr_mediana": 14.75,
-      "dat_indicador": "2026-04-14"
-    }
-  ]
-}
-```
-
-Funções disponíveis:
-- `salvar_cache_taxas(indicadores)` — grava a lista retornada pelo Supabase
-- `carregar_cache_taxas()` → retorna lista no mesmo formato da view
-- `data_cache_taxas()` → string ISO da última atualização ou None
-
----
-
-## Fluxo de dados na inicialização
-
-```
-App inicia
-  └── supabase_client.buscar_indicadores()
-        ├── [sucesso] → salvar_cache_taxas(dados) → usa os dados
-        └── [falha]   → carregar_cache_taxas() → usa cache local
-  └── carregar_carteira() → restaura investimentos do usuário
-```
-
----
+O cache de taxas fica em data/cache_taxas.json e é uma cópia do que veio da view do Supabase, no mesmo formato, junto com a data em que foi salvo. Na inicialização o app tenta buscar as taxas online e, conseguindo, regrava o cache com salvar_cache_taxas. Se a busca falhar, carregar_cache_taxas devolve a última cópia salva e o simulador funciona offline. A data_cache_taxas informa quando foi a última atualização, que é a data mostrada no cabeçalho da interface.
 
 ## Validação
 
-O script `testar_persistencia.py` em `src/testes/` testa todas as funções de forma isolada:
-- Salvar, carregar, atualizar e remover itens da carteira
-- Resiliência a JSON corrompido (retorna lista vazia em vez de crashar)
-- Salvar e carregar cache de taxas
-- Verificação de data da última atualização do cache
+O testar_persistencia.py cobre essas funções numa pasta temporária: salvar, carregar, atualizar e remover itens da carteira, o comportamento com JSON corrompido (que devolve lista vazia) e o ciclo completo do cache de taxas, incluindo a data de atualização. Roda a partir da pasta src com python testes/testar_persistencia.py.
 
----
-
-*Última atualização: Semana 7 — 19/05/2026*
+*Última atualização: 09/06/2026*
