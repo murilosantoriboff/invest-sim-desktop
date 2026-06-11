@@ -2,6 +2,9 @@
 
 ## Caminho dos dados no sistema
 
+Tudo começa nas taxas. Na inicialização, o buscar_indicadores do supabase_client.py consulta a view no Supabase. Dando certo, o resultado é gravado no cache local pelo salvar_cache_taxas; dando errado (sem internet, por exemplo), o carregar_cache_taxas devolve a última cópia salva. Junto disso, o carregar_carteira lê do JSON os investimentos que o usuário já tinha, ou devolve uma lista vazia na primeira execução.
+
+Com taxas e carteira em mãos, o preparar_dados_grafico do calculator.py aplica os juros compostos ano a ano e devolve a lista pronta pro desenho, e o calcular_totais agrega os valores da carteira inteira. A última etapa é da interface, que desenha o gráfico de rosca e os cards a partir dessa lista.
 ```
 Supabase (API BCB)
     │
@@ -23,49 +26,18 @@ supabase_client.buscar_indicadores()
             interface.desenhar_grafico()
 ```
 
-## Detalhamento
+## As ações do usuário
 
-### 1. Obter taxas
+Adicionar, editar e remover investimento seguem o mesmo circuito: a mudança entra na carteira, a carteira é salva no JSON, o calculator recalcula e a interface redesenha. Mudar o prazo é mais simples, só recalcula e redesenha, sem salvar nada, porque o prazo não faz parte da carteira.
 
-Na inicialização, o sistema tenta buscar as taxas do Supabase via `buscar_indicadores()`. Se conseguir, salva no cache local com `salvar_cache_taxas()`. Se falhar (sem internet, erro de API), carrega do cache com `carregar_cache_taxas()`.
+## Quem faz o quê
 
-### 2. Carregar carteira
-
-A carteira do usuário é carregada do JSON local com `carregar_carteira()`. Retorna lista vazia se for a primeira vez.
-
-### 3. Calcular projeções
-
-`preparar_dados_grafico()` recebe a carteira e as taxas, aplica juros compostos ano a ano com taxas variáveis, e retorna uma lista com tudo que o gráfico precisa.
-
-`calcular_totais()` agrega os valores da carteira inteira.
-
-### 4. Interações do usuário
-
-| Ação | O que acontece |
-|---|---|
-| Adicionar investimento | Insere na carteira → salva JSON → recalcula → redesenha |
-| Remover investimento | Remove da carteira → salva JSON → recalcula → redesenha |
-| Mudar prazo | Recalcula com novo prazo → redesenha |
-
-## Módulos envolvidos
-
-| Camada | Módulo | Papel |
-|---|---|---|
-| Persistência remota | `supabase_client.py` | Busca taxas do Supabase |
-| Persistência local | `armazenamento.py` | Cache de taxas + carteira |
-| Regra de negócio | `calculator.py` | Projeção financeira |
-| Configuração | `constants.py` | Investimentos e cores |
-| Interface | `interface.py` | Gráfico e interação |
+O supabase_client.py é a persistência remota e só busca taxas. O armazenamento.py é a persistência local, do cache e da carteira. O calculator.py faz a projeção financeira sem saber de onde os dados vieram. O constants.py guarda o mapeamento de investimentos e as cores, e o interface.py desenha tudo e captura as interações.
 
 ## Validação
 
-`src/testes/testar_integracao.py` testa o fluxo completo:
-
-- **Online**: busca do Supabase → salva cache → calcula
-- **Offline**: cache simulado → salva/carrega carteira → calcula → adicionar/remover
-
-Rodar a partir de `src/`: `python testes/testar_integracao.py`
+O testar_integracao.py percorre esse fluxo de ponta a ponta nos dois modos: online, buscando do Supabase de verdade, salvando o cache e calculando em cima dos dados reais, e offline, com taxas simuladas, exercitando salvar e carregar a carteira, mexer nos itens e mudar o prazo. Roda a partir da pasta src com python testes/testar_integracao.py.
 
 ---
 
-*Última atualização: Semana 5 — 05/05/2026*
+*Última atualização: 10/06/2026*
