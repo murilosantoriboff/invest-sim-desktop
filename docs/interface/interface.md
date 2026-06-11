@@ -1,54 +1,25 @@
-# Interface do Simulador de Investimentos
+# Interface do Simulador
 
-A interface é construída com Tkinter e organizada em dois arquivos na pasta `src/ui/`: `interface.py`, responsável por todos os componentes visuais, e `tooltip.py`, responsável pelos tooltips e pelo glossário.
+A interface é feita com Tkinter e está em dois arquivos na pasta src/ui: o interface.py, com todos os componentes visuais, e o tooltip.py, com os tooltips e o glossário.
 
----
+## Estrutura da janela
 
-## Estrutura geral
+A janela abre centralizada com quatro seções empilhadas. No topo o cabeçalho, com o título, a data da última atualização das taxas, o botão de exportar PDF e o botão de interrogação que abre o glossário. Abaixo vem o painel de entrada, onde o usuário escolhe o tipo de investimento (um botão por tipo), digita o valor e ajusta o prazo em anos com os botões de mais e menos. Na sequência fica a barra de chips, que lista os investimentos já adicionados: cada chip mostra a cor e o valor do item e tem dois botõezinhos, um lápis pra editar o valor e um xis pra remover. Por fim a área principal, com o gráfico de rosca à esquerda e os cards detalhados à direita, os dois atualizados a cada mudança.
 
-A janela é composta por quatro seções empilhadas verticalmente:
+## Componentes do interface.py
 
-1. **Header** — título do app, data de atualização das taxas, botão de exportar PDF e botão `?` que abre o glossário.
-2. **Painel de input** — onde o usuário configura e adiciona investimentos. Contém seleção de tipo (pills), campo de valor e controle de prazo em anos.
-3. **Chips bar** — lista horizontal dos investimentos já adicionados à carteira, cada um com botão de remoção `×`.
-4. **Área principal** — gráfico de rosca à esquerda e grid de cards à direita, ambos atualizados em tempo real.
+O cabeçalho e o painel de entrada são montados por criar_header e criar_input_panel. O campo de valor tem validação em tempo real que só aceita dígitos, ponto e vírgula, e a tecla Enter adiciona direto, sem precisar clicar no botão.
 
----
+A barra de chips usa um truque: um tk.Text desabilitado serve de container e cada chip é um tk.Frame embutido nele, o que faz os chips quebrarem de linha sozinhos quando a carteira cresce. Clicando no lápis de um chip abre uma janela já preenchida com o valor atual pedindo o novo valor. Se o usuário confirmar um valor válido, a carteira é salva e tudo se redesenha; se cancelar ou digitar algo inválido, nada muda.
 
-## Componentes principais
+O desenhar_grafico monta monta o gráfico no canvas e escreve no centro o total investido, o ganho (verde quando positivo, vermelho quando negativo) e o prazo. Com a carteira vazia, aparece uma mensagem no lugar do gráfico. O atualizar_legenda reconstrói os cards, cada um com nome, valor investido, projeção, ganho com percentual e a taxa anual equivalente. A área dos cards tem rolagem própria.
 
-### `criar_header`
-Monta o cabeçalho com o título, subtítulo e botões no lado direito.
+## Tooltips e glossário
 
-### `criar_input_panel`
-Renderiza o painel de adição de investimentos. Os tipos disponíveis são lidos de `INVESTIMENTOS` e exibidos como botões pill. O campo de valor tem validação em tempo real que aceita apenas dígitos, ponto e vírgula. O prazo é controlado por botões `−` e `+`.
+O Tooltip aparece depois de meio segundo com o mouse parado sobre o componente e some quando o ponteiro sai de verdade. O glossário abre numa janela centralizada com rolagem, listando cada tipo de investimento com nome e descrição, e fecha pelo botão ou pela tecla Escape.
 
-### `criar_chips_bar` / `atualizar_chips`
-Usa um `tk.Text` desabilitado como container para os chips. Cada chip é um `tk.Frame` embutido via `window_create`.
+## Detalhes de comportamento
 
-### `criar_area_grafico`
-Divide a área principal em canvas (gráfico) à esquerda e um scroll canvas com `legenda_frame` à direita, com barra de rolagem vertical.
+Como o botão nativo do tk não tem estado de hover, a troca de cor ao passar o mouse é feita manualmente. O scroll do mouse é direcionado pro canvas certo conforme a posição do ponteiro. Os estilos ttk ficam concentrados numa função só de configuração, incluindo um estilo por tipo de investimento, usando a cor definida nas constantes.
 
-### `desenhar_grafico`
-Desenha o gráfico de rosca no canvas usando `create_arc`. No centro exibe o total investido, o ganho total (verde/vermelho) e o prazo. Com carteira vazia, exibe uma mensagem automática.
-
-### `atualizar_legenda`
-Reconstrói os cards de investimento no grid. Cada card mostra: nome, valor investido, projeção futura, ganho com percentual e taxa anual.
-
----
-
-## Tooltips e Glossário (`tooltip.py`)
-
-### `Tooltip`
-Aparece após 500 ms de hover sobre um widget. Trata o caso de o ponteiro passar para um filho do widget sem sumir o tooltip (`_verificar_saida` + `_eh_descendente`).
-
-### `abrir_glossario`
-Abre uma janela centralizada com scroll vertical, listando todos os tipos de investimento com nome e descrição. Fecha com o botão "Fechar" ou pela tecla `Escape`.
-
----
-
-## Detalhes de UX
-
-- **Hover em botões tk nativos** é feito manualmente via `_adicionar_hover`, já que `tk.Button` não suporta estados CSS.
-- **Scroll do mouse** é propagado para o canvas correto via `_bind_scroll`, aplicado ao canvas e a todos os widgets filhos.
-- **Estilos ttk** são configurados em `configurar_estilos()`, incluindo um estilo `Pill_{cod}` dinâmico por tipo de investimento, usando a cor definida nas constantes.
+*Última atualização: 10/06/2026*
