@@ -18,7 +18,7 @@ A cfg_indicadores_investimento é a configuração estática: uma linha por inve
 
 A stg_indicadores_bcb recebe os dados brutos extraídos da API Focus do Banco Central: nome do indicador, data da consulta, ano de referência da projeção, a mediana da expectativa de mercado e a data e hora em que o registro foi inserido.
 
-A vw_indicadores_investimento é o que o simulador realmente consulta. Ela filtra só os registros da data mais recente, junta as duas tabelas e calcula as taxas derivadas: o CDI sai como Selic menos 0 10, e a Poupança como 70% da Selic quando esta fica até 8.5%, ou 6.17% fixos quando passa disso. O app recebe o código, o nome, o ano de referência, o valor e a data do indicador, tudo pronto pra usar.
+A vw_indicadores_investimento é o que o simulador realmente consulta. Ela filtra só os registros da data mais recente, junta as duas tabelas e calcula as taxas derivadas: o CDI sai como Selic menos 0,10, e a Poupança como 70% da Selic quando esta fica até 8,5%, ou 6,17% fixos quando passa disso. O app recebe o código, o nome, o ano de referência, o valor e a data do indicador, tudo pronto pra usar.
 
 Quem alimenta a stg é a Edge Function f_indicadores_bcb, agendada pra rodar uma vez por dia no Supabase. Ela consulta a API pública de expectativas anuais do BCB, pega todos os registros da data mais recente disponível e grava na tabela, atualizando o que já existia.
 

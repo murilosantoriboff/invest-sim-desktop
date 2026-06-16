@@ -12,7 +12,7 @@ O cabeçalho e o painel de entrada são montados por criar_header e criar_input_
 
 A barra de chips usa um truque: um tk.Text desabilitado serve de container e cada chip é um tk.Frame embutido nele, o que faz os chips quebrarem de linha sozinhos quando a carteira cresce. Clicando no lápis de um chip abre uma janela já preenchida com o valor atual pedindo o novo valor. Se o usuário confirmar um valor válido, a carteira é salva e tudo se redesenha; se cancelar ou digitar algo inválido, nada muda.
 
-O desenhar_grafico monta monta o gráfico no canvas e escreve no centro o total investido, o ganho (verde quando positivo, vermelho quando negativo) e o prazo. Com a carteira vazia, aparece uma mensagem no lugar do gráfico. O atualizar_legenda reconstrói os cards, cada um com nome, valor investido, projeção, ganho com percentual e a taxa anual equivalente. A área dos cards tem rolagem própria.
+O desenhar_grafico monta o gráfico no canvas e escreve no centro o total investido, o ganho (verde quando positivo, vermelho quando negativo) e o prazo. Com a carteira vazia, aparece uma mensagem no lugar do gráfico. O atualizar_legenda reconstrói os cards, cada um com nome, valor investido, projeção, ganho com percentual e a taxa anual equivalente. A área dos cards tem rolagem própria.
 
 ## Tooltips e glossário
 
